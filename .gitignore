@@ -1,0 +1,65 @@
+# 本文件列出永远不进 git 的文件和目录（规格书 16.1 节、D43）。
+# 这是第一道防线；推送前还要运行敏感字眼扫描（scripts/scan_secrets_before_push.py）。
+# 注意：只对「还没提交过」的文件有效；已提交过的文件后来再写进这里，也不会从历史记录里消失。
+# 它只按文件名挡，挡不住写在代码、注释里的敏感内容，那部分靠敏感字眼扫描。
+
+# ===== 内部文件（含个人部署信息、协作规程）=====
+ai_guide/
+docs/internal_not_public/
+docs/ui_reference/
+CLAUDE.md
+# Trae 编辑器的项目规则等（与 CLAUDE.md 同属 AI 协作守则）
+.trae/
+# 敏感字眼扫描的个人词表（放在 ai_guide/ 里；这里再单独挡一次，防止被挪到别处后上传）
+sensitive_words*.txt
+
+# ===== 数据与日志（行情、用户练习记录）=====
+local_data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.parquet
+*.log
+# 抽片段用的缓存（segment_picker.py，默认在 local_data/ 下；数据目录改到别处时靠这一行挡）
+*.npz
+
+# ===== Debug 草稿纸 =====
+tm_*/
+
+# ===== 密钥（模板 .env.example 保留上传）=====
+.env
+.env.*
+!.env.example
+# 服务器登录密钥、证书（部署 VPS 时可能出现在项目里）
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+
+# ===== Python =====
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ===== 前端（第三方库可重新安装；打包结果由 GitHub 发版时自动生成）=====
+web_frontend/node_modules/
+web_frontend/dist/
+web_frontend/coverage/
+*.tsbuildinfo
+
+# ===== 本机工具与系统文件 =====
+.claude/
+.vscode/
+.idea/
+.DS_Store
+
+# 启动时打包网页用的临时目录（scripts/start_local_server.py）
+web_frontend/dist_building/

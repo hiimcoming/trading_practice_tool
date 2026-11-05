@@ -1,0 +1,444 @@
+/* 网站样式。颜色全部用 CSS 变量，由 theme_palettes.ts 按所选配色改写；下面是默认「柔和浅灰」的初始值（规格书 15.11 节）。
+   原则：练习页 K 线图优先，整页不出现滚动条（规格书 5.6 节）；其他页面是普通的可滚动页面。 */
+:root {
+  --bg: #e7eaee; --panel: #f4f5f7; --hover: #dde1e7; --border: #d3d7de; --text: #2b2f36; --muted: #6b7280;
+  --accent: #2962ff; --profit: #0b9c7c; --loss: #e0464b; --danger: #d32f2f;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+  font: 13px -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+#app { height: 100%; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button, select, input { font: inherit; color: var(--text); }
+button { background: var(--panel); border: 1px solid var(--border); border-radius: 4px; padding: 4px 10px; cursor: pointer; white-space: nowrap; }
+button:hover:not(:disabled) { background: var(--hover); }
+button:disabled { opacity: .5; cursor: default; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.primary:hover:not(:disabled) { filter: brightness(1.08); background: var(--accent); }
+button.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+button.link, button.danger-link { border: 0; background: none; padding: 2px 0; color: var(--accent); }
+button.danger-link { color: var(--danger); }
+button.icon { border: 0; background: none; padding: 2px 6px; font-size: 15px; }
+button.big { padding: 8px 28px; font-size: 15px; }
+select, input { background: var(--panel); border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; }
+.muted { color: var(--muted); }
+.error { color: var(--danger); }
+.profit { color: var(--profit); }
+.loss { color: var(--loss); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+kbd { background: var(--panel); border: 1px solid var(--border); border-radius: 3px; padding: 1px 6px; font-family: inherit; }
+
+/* ---------- 普通页面 ---------- */
+.page { max-width: 1180px; margin: 0 auto; padding: 18px 20px 40px; height: 100%; overflow: auto; }
+.page-header { display: flex; align-items: center; gap: 18px; margin-bottom: 14px; }
+.page-header h1 { margin: 0; font-size: 20px; }
+.page-header nav { display: flex; gap: 14px; }
+.page-header > a, .page-header nav { margin-left: auto; }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; }
+.card h2 { margin: 0 0 10px; font-size: 15px; }
+.enter-card { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.enter-card input { width: 220px; }
+.enter-card .error { width: 100%; }
+.form-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0; }
+.form-row > label:first-child { width: 72px; color: var(--muted); }
+label.inline { display: inline-flex; align-items: center; gap: 6px; }
+.segmented { display: inline-flex; gap: 2px; }
+.segmented button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.start-card .link { display: block; }
+.start-card .big { display: block; margin: 10px 0 6px; }
+.active-card { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; border-color: var(--accent); }
+.danger-zone { background: none; border-style: dashed; }
+.empty { padding: 12px 0; }
+.tabs { display: flex; align-items: center; gap: 4px; margin-bottom: 8px; }
+.tabs-title { font-weight: 600; margin-right: 10px; }
+.tab { border-color: transparent; background: none; }
+.tab.active { background: var(--bg); border-color: var(--border); font-weight: 600; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th, .data-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+.data-table th { color: var(--muted); font-weight: 500; white-space: nowrap; }
+.users-table th { cursor: pointer; user-select: none; }
+.users-table tr.few-samples td { color: var(--muted); }
+.users-table tr.few-samples td.profit, .users-table tr.few-samples td.loss { opacity: .55; }
+.badge { margin-left: 6px; font-size: 11px; padding: 0 5px; border-radius: 3px; background: var(--hover); color: var(--muted); }
+.sparkbars .bar-profit { fill: var(--profit); }
+.sparkbars .bar-loss { fill: var(--loss); }
+.month-grid { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 10px; }
+.month-cell { font-size: 10px; padding: 3px 4px; border-radius: 3px; background: var(--hover); color: var(--muted); }
+.month-cell.complete { background: color-mix(in srgb, var(--profit) 25%, transparent); color: var(--text); }
+.month-cell.warnings { background: color-mix(in srgb, #f5a623 35%, transparent); color: var(--text); }
+.month-cell.failed { background: color-mix(in srgb, var(--loss) 35%, transparent); color: var(--text); }
+
+/* ---------- 练习页（整页不滚动） ---------- */
+.practice { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.topbar { height: 40px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 8px; border-bottom: 1px solid var(--border);
+  background: var(--panel); white-space: nowrap; overflow: hidden; }
+.topbar .symbol { margin: 0 4px; }
+.topbar .sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+.topbar .spacer { flex: 1; }
+/* 顶栏第 2 行（D63）：比第 1 行矮一点；左边的空位留给第 4b 阶段的画线设置工具条 */
+.topbar.topbar-row2 { height: 32px; }
+.drawing-settings-slot { display: flex; align-items: center; gap: 4px; min-width: 0; }
+/* 画线设置工具条（D64）：选中画线时出现；弹出的色板和菜单挂在 body 上（顶栏会裁掉溢出的内容） */
+.drawing-settings { display: flex; align-items: center; gap: 4px; }
+.drawing-settings[hidden] { display: none; }
+.drawing-settings .ds-name { color: var(--muted); margin-right: 4px; }
+.drawing-settings button { height: 24px; min-width: 26px; padding: 0 5px; display: inline-flex; align-items: center; gap: 4px; }
+.drawing-settings button.active { background: var(--hover); }
+.drawing-settings .ds-color::before { content: ''; width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border);
+  background: var(--swatch, #2962ff); }
+.ds-popup { position: fixed; z-index: 50; padding: 8px; background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.15); }
+.ds-palette { display: grid; grid-template-columns: repeat(10, 18px); gap: 3px; }
+.ds-palette button { width: 18px; height: 18px; padding: 0; border: 1px solid rgba(0,0,0,.12); border-radius: 3px; }
+.ds-palette button.current { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ds-opacity { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; color: var(--muted); font-size: 12px; }
+.ds-opacity input { width: 100%; }
+.ds-menu { display: flex; flex-direction: column; padding: 4px; }
+.ds-menu button { display: flex; align-items: center; gap: 8px; border: 0; background: transparent; padding: 4px 8px; text-align: left; }
+.ds-menu button:hover, .ds-menu button.current { background: var(--hover); }
+.account-summary .sep { display: inline-block; vertical-align: middle; margin: 0 8px; }
+.topbar .save-status.unsaved { color: var(--danger); font-weight: 600; }
+.topbar .save-status.saving { color: var(--muted); }
+.tf-buttons button { padding: 3px 7px; }
+.menu-wrap { position: relative; }
+.menu { position: absolute; top: 30px; left: 0; z-index: 20; display: flex; flex-direction: column; min-width: 120px; padding: 4px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.15); }
+.menu a { padding: 6px 10px; color: var(--text); }
+.menu a:hover { background: var(--hover); text-decoration: none; }
+.workspace { flex: 1; display: flex; min-height: 0; }
+.draw-toolbar { width: 40px; flex: none; display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 6px;
+  border-right: 1px solid var(--border); background: var(--panel); }
+.draw-toolbar button { width: 30px; height: 30px; padding: 0; font-size: 15px; }
+.draw-toolbar button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.draw-toolbar button svg { display: block; margin: auto; }
+.draw-toolbar button.off svg { opacity: .3; } /* 开平仓箭头已隐藏 */
+.draw-toolbar button.active svg circle { fill: var(--accent); }
+.draw-toolbar hr { width: 24px; border: 0; border-top: 1px solid var(--border); margin: 4px 0; }
+.chart-area { flex: 1; position: relative; min-width: 0; }
+.chart { position: absolute; inset: 0; }
+/* K 线图左上角一行：品种 · 周期、星期时刻、进度（D56），三段之间留白，次要信息颜色淡一点 */
+.chart-legend { position: absolute; left: 8px; top: 6px; z-index: 3; pointer-events: none; color: var(--muted); display: flex; gap: 18px;
+  font-variant-numeric: tabular-nums; white-space: nowrap; }
+.chart-legend b { color: var(--text); }
+.chart-legend .progress.done { color: var(--profit); font-weight: 600; }
+.chart-legend .queued-badge { color: var(--accent); font-weight: 600; }
+/* 周五收盘倒计时（D85）：有持仓或挂单时橙色加粗，提醒别把仓位带过周末 */
+.chart-legend .weekend-countdown.at-risk { color: #e8870e; font-weight: 600; }
+.topbar .auto-step { display: inline-flex; align-items: center; gap: 3px; margin-left: 6px; font-size: 12px; color: var(--muted); white-space: nowrap; cursor: pointer; }
+.chart-note { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); z-index: 5; padding: 3px 10px; border-radius: 4px;
+  background: var(--panel); border: 1px solid var(--border); color: var(--muted); }
+.toast { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); z-index: 6; padding: 6px 14px; border-radius: 6px; cursor: pointer;
+  background: var(--profit); color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+/* 右侧下单面板：宽度固定按窗口比例（约 21%，照 Exness），不能拖动；放不下时面板内部滚动，整页仍不滚动（D56） */
+.order-panel { width: clamp(250px, 21vw, 340px); flex: none; border-left: 1px solid var(--border); background: var(--panel);
+  padding: 8px 10px; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: 5px; }
+.order-panel > * { flex-shrink: 0; } /* 高度不够时面板内部滚动，而不是把输入框压扁 */
+.order-panel.collapsed { width: 14px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); }
+.order-panel.collapsed:hover { background: var(--hover); }
+.panel-head { display: flex; justify-content: space-between; align-items: center; }
+.quote-buttons { position: relative; display: flex; gap: 6px; }
+.quote { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 6px 8px; border-width: 1px;
+  background: var(--bg); font-variant-numeric: tabular-nums; }
+.quote span { font-size: 11px; }
+.quote b { font-size: 15px; }
+.quote.sell { border-color: var(--loss); color: var(--loss); }
+.quote.buy { border-color: var(--buy, #2962ff); color: var(--buy, #2962ff); align-items: flex-end; }
+.quote.sell:hover:not(:disabled) { background: color-mix(in srgb, var(--loss) 10%, var(--bg)); }
+.quote.buy:hover:not(:disabled) { background: color-mix(in srgb, #2962ff 10%, var(--bg)); }
+.spread-tag { position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%); font-size: 10px; padding: 0 4px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 3px; color: var(--muted); }
+.order-type, .size-mode { display: flex; margin-top: 6px; }
+.order-type button, .size-mode button { flex: 1; padding: 3px 0; }
+.field-label { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.field-note { color: var(--muted); font-size: 11px; line-height: 1.35; }
+.stepper { display: flex; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); overflow: hidden; }
+.stepper input { flex: 1; min-width: 0; border: 0; border-radius: 0; background: none; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+.stepper .unit { padding: 5px 6px; color: var(--muted); font-size: 11px; align-self: center; }
+.stepper .unit.clear { border: 0; background: none; color: var(--muted); font-size: 14px; }
+.stepper button { border: 0; border-left: 1px solid var(--border); border-radius: 0; width: 30px; padding: 0; background: none; }
+.order-info { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; margin: 4px 0 0; font-size: 12px; }
+.order-info dt { color: var(--muted); }
+.order-info dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.order-info small, .account-details small { color: var(--muted); font-size: 11px; }
+.order-reason { color: var(--danger); font-size: 12px; margin-top: 4px; }
+.buy-text { color: #2962ff; }
+.sell-text { color: var(--loss); }
+.warn { color: #e8860c; font-weight: 600; }
+/* 顶栏账户摘要与下拉 */
+.account-wrap { position: relative; }
+.account-summary { border-color: transparent; background: none; font-variant-numeric: tabular-nums; }
+/* 顶栏为了不换行会裁掉超出部分，所以下拉按窗口定位 */
+.account-dropdown { position: fixed; right: 8px; top: 74px; z-index: 30; width: 460px; max-width: 92vw; padding: 12px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  display: flex; flex-direction: column; gap: 10px; white-space: normal; }
+.account-details { display: flex; gap: 18px; }
+.account-col { flex: 1; }
+.account-col dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 6px 0 0; }
+.account-col dt { color: var(--muted); }
+.account-col dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.transfer-form { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--border); padding-top: 8px; }
+.transfer-row { display: flex; gap: 8px; align-items: center; }
+.transfer-row input { width: 130px; }
+.dialog.wide { max-width: 560px; }
+/* 持仓面板里的表格 */
+.pad { padding: 8px 10px; margin: 0; }
+.row-actions { white-space: nowrap; text-align: right; }
+.row-actions button { margin-left: 10px; }
+td.editable { cursor: text; text-decoration: underline dotted var(--muted); text-underline-offset: 3px; }
+td.editable:hover { background: var(--hover); }
+td.editing { white-space: nowrap; }
+td.editing input { width: 110px; padding: 1px 6px; text-align: right; }
+td.editing button { margin-left: 6px; }
+td.editable.active { background: var(--hover); }
+/* 部分平仓小菜单：浮在手数格子上方，不撑宽表格 */
+.partial-close-menu { position: fixed; z-index: 30; width: 250px; padding: 6px; display: flex; flex-direction: column; gap: 4px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.15); }
+.partial-close-menu .pc-title { color: var(--muted); font-size: 12px; padding: 0 2px 2px; }
+.partial-close-menu .pc-option { display: flex; gap: 10px; justify-content: flex-start; text-align: left; padding: 4px 8px;
+  font-variant-numeric: tabular-nums; }
+.partial-close-menu .pc-option b { width: 34px; }
+.partial-close-menu .pc-custom { display: flex; align-items: center; gap: 6px; }
+.partial-close-menu .pc-custom input { flex: 1; min-width: 0; padding: 2px 6px; text-align: right; }
+.partial-close-menu .pc-note { color: var(--muted); font-size: 12px; padding: 0 2px; font-variant-numeric: tabular-nums; }
+.edit-position { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.edit-position input { width: 100px; }
+.edit-position .sep { width: 1px; height: 18px; background: var(--border); }
+.toast.notice { background: var(--danger); top: 40px; }
+.positions-panel { flex: none; position: relative; display: flex; flex-direction: column; border-top: 1px solid var(--border); background: var(--panel); }
+.resize-handle { position: absolute; top: -3px; left: 0; right: 0; height: 6px; cursor: ns-resize; z-index: 4; }
+.panel-tabs { height: 28px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 6px; }
+.panel-tabs .hint { flex: 1; text-align: right; color: var(--muted); overflow: hidden; text-overflow: ellipsis; padding: 0 8px; }
+.panel-body { flex: 1; overflow: auto; }
+.data-table.compact th, .data-table.compact td { padding: 3px 8px; }
+.overlay { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.28); }
+.dialog { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 18px 22px; max-width: 460px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25); display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.dialog p { margin: 0; line-height: 1.6; }
+/* 窄屏自动收紧（不再挡住页面）：<1280 按钮只留图标、次要信息缩短；<1000 再缩小字号和间距、隐藏操作提示 */
+@media (max-width: 1279px) {
+  .topbar { gap: 4px; padding: 0 6px; }
+  .topbar .label, .panel-tabs .hint { display: none; }
+  .topbar button { padding: 3px 7px; }
+  .tf-buttons button { padding: 3px 5px; }
+  .topbar .sep { margin: 0 2px; }
+}
+@media (max-width: 999px) {
+  html, body { font-size: 12px; }
+  .chart-legend { gap: 10px; }
+  .order-panel { padding: 6px 8px; gap: 4px; }
+  .quote b { font-size: 13px; }
+  .topbar { gap: 3px; padding: 0 4px; }
+  .topbar .symbol { display: none; }
+  .topbar select { padding: 2px 4px; }
+  .tf-buttons button { padding: 2px 4px; }
+  .draw-toolbar { width: 34px; }
+  .draw-toolbar button { width: 26px; height: 26px; font-size: 13px; }
+}
+/* 价格轴「+」与菜单（第 1 阶段原型的样式，D44 用户实测通过） */
+.axis-plus-button { position: absolute; z-index: 4; width: 20px; height: 20px; display: none; align-items: center; justify-content: center;
+  pointer-events: none; border-radius: 3px; background: var(--hover); color: var(--text); font-size: 16px; line-height: 1; }
+.axis-plus-button.hover { background: #2962ff; color: #fff; }
+.axis-plus-menu { position: absolute; z-index: 6; display: none; flex-direction: column; gap: 2px; padding: 4px; min-width: 170px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+.axis-plus-menu button { text-align: left; border: 0; background: none; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+.axis-plus-menu button:hover { background: var(--hover); }
+.axis-plus-menu button.buy { color: #2962ff; }
+.axis-plus-menu button.sell { color: var(--loss); }
+.axis-plus-menu .note { padding: 3px 8px; color: var(--muted); }
+/* 草稿单：提交 / 取消；挂单标签下选中的方向 */
+.draft-bar { display: flex; gap: 6px; margin-top: 4px; }
+.draft-bar .submit { flex: 1; }
+.draft-bar .submit.buy { background: #2962ff; border-color: #2962ff; }
+.draft-bar .submit.sell { background: var(--loss); border-color: var(--loss); }
+.quote[data-selected] { box-shadow: inset 0 0 0 2px currentColor; }
+.warn-note { color: #e8860c; }
+/* 图上订单线的标签（照 Exness：文字 ｜ ×）：叠在图表上，跟着线的高度走；按住标签也能拖线 */
+.order-line-labels { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+.order-line-label { position: absolute; display: flex; align-items: center; height: 20px; padding: 0 0 0 6px; border: 1px solid; border-radius: 3px;
+  background: var(--panel); font-size: 12px; white-space: nowrap; font-variant-numeric: tabular-nums; pointer-events: auto; user-select: none; }
+.order-line-label.draggable { cursor: ns-resize; }
+/* D82：标签被挤开时连回自己价位的竖直虚线（不挡鼠标） */
+.order-line-leader { position: absolute; width: 0; border-left: 1px dashed; pointer-events: none; }
+.order-line-label.dragging { box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+.order-line-label .text { padding-right: 6px; }
+.order-line-label .x { border: 0; border-left: 1px solid currentColor; border-radius: 0; background: none; color: inherit; padding: 0 6px;
+  height: 100%; font-size: 13px; line-height: 1; cursor: pointer; }
+.order-line-label .x:hover { background: var(--hover); }
+/* 草稿单标签上的「提交」：卖出红、买入蓝；不能下单时变灰（悬停看原因） */
+.order-line-label .submit { border: 0; border-left: 1px solid currentColor; border-radius: 0; height: 100%; padding: 0 8px; font-size: 12px;
+  line-height: 1; color: #fff; cursor: pointer; }
+.order-line-label .submit.buy { background: #2962ff; }
+.order-line-label .submit.sell { background: var(--loss); }
+.order-line-label .submit.disabled { background: var(--hover); color: var(--muted); cursor: not-allowed; }
+.order-line-label .submit:not(.disabled):hover { filter: brightness(1.1); }
+/* 线标签左边的 TP / SL 快捷按钮（照 Exness：虚线小框，止盈绿、止损橙） */
+.order-line-label .q { border: 1px dashed; border-radius: 3px; background: var(--panel); height: 18px; padding: 0 6px; margin: 0 4px 0 -2px;
+  font-size: 11px; line-height: 1; cursor: pointer; }
+.order-line-label .q.tp { color: #0b9c7c; border-color: #0b9c7c; }
+.order-line-label .q.sl { color: #e8860c; border-color: #e8860c; }
+.order-line-label .q:hover { background: var(--hover); }
+/* 测量尺（D61）：往上拖绿色、往下拖红色；松手就消失 */
+.measure-box { position: absolute; z-index: 4; pointer-events: none; display: none; border: 1px solid; }
+.measure-box.up { background: color-mix(in srgb, #0b9c7c 14%, transparent); border-color: #0b9c7c; }
+.measure-box.down { background: color-mix(in srgb, #e0464b 14%, transparent); border-color: #e0464b; }
+.measure-label { position: absolute; z-index: 5; pointer-events: none; display: none; padding: 3px 8px; border-radius: 4px;
+  color: #fff; font-size: 12px; line-height: 1.4; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.measure-label.up { background: #0b9c7c; }
+.measure-label.down { background: #e0464b; }
+
+/* ---------- 单轮简报与静态 K 线图（第 5a 阶段） ---------- */
+.kv-grid { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; align-items: baseline; }
+.kv-grid > span { color: var(--muted); }
+.kv-grid b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.equity-chart { height: 220px; margin-bottom: 10px; }
+.report-progress ol { list-style: none; padding: 0; margin: 0 0 10px; }
+.report-progress li { padding: 3px 0; color: var(--muted); }
+.report-progress li.done { color: var(--profit); }
+.report-progress li.current { color: var(--text); font-weight: 600; }
+.progress-bar { height: 6px; background: var(--hover); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+.progress-bar > div { height: 100%; background: var(--accent); transition: width .3s; }
+.violations { margin: 0; padding-left: 18px; }
+.violations li { padding: 2px 0; }
+.clickable-rows tbody tr { cursor: pointer; }
+.clickable-rows tbody tr:hover { background: var(--hover); }
+.review-page { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.review-bar { flex: none; display: flex; align-items: center; gap: 12px; padding: 6px 10px; border-bottom: 1px solid var(--border);
+  background: var(--panel); white-space: nowrap; overflow: hidden; }
+.review-bar .tf-buttons button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.review-chart { flex: 1; min-height: 0; position: relative; }
+
+/* ---------- 统计与审查页（第 5b 阶段） ---------- */
+.stats-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; color: var(--muted); }
+.button-link { padding: 3px 10px; border: 1px solid var(--border); border-radius: 4px; background: var(--hover); }
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.card-head h2 { margin: 0; }
+.small { font-size: 12px; }
+.extras { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); margin: 6px 0; }
+.extras label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; margin-top: 10px; }
+.kpi-group { font-size: 11px; color: var(--muted); opacity: .8; }
+.kpi-card { display: flex; flex-direction: column; align-items: stretch; gap: 2px; text-align: left; padding: 8px 10px; height: auto;
+  border: 1px solid var(--border); border-radius: 6px; background: var(--panel); cursor: pointer; }
+.kpi-card:hover { background: var(--hover); }
+.kpi-card.on { border: 2px solid var(--accent); padding: 7px 9px; }
+.kpi-label { font-size: 12px; color: var(--muted); }
+.kpi-value { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.kpi-delta { font-size: 12px; }
+.kpi-delta.good { color: var(--profit); }
+.kpi-delta.bad { color: var(--loss); }
+.kpi-delta.muted { color: var(--muted); }
+.kpi-spark svg.spark { display: block; width: 100%; height: 28px; margin-top: 4px; }
+.detail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin: 16px 0 6px; }
+.detail-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 14px; font-size: 12px; color: var(--muted); min-height: 18px; }
+.lg-item { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.lg-item i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
+.lg-item b { color: var(--text); font-variant-numeric: tabular-nums; }
+.lg-round { color: var(--text); font-weight: 600; }
+.detail-chart { height: clamp(240px, 38vh, 380px); position: relative; }
+.range-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.warn-card { border-color: #f5a623; background: color-mix(in srgb, #f5a623 12%, var(--panel)); }
+.notice-card { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--panel)); }
+.hints { margin: 0; padding-left: 18px; }
+.hints li { padding: 2px 0; }
+.two-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 10px 28px; }
+.kv-grid b.pre { white-space: pre-line; }
+.equity-chart.small { height: 160px; }
+.review h3 { font-size: 13px; margin: 14px 0 6px; }
+.review-table { margin-bottom: 6px; }
+.streaks { margin: 0; padding-left: 18px; font-size: 13px; }
+/* 纪律审查三层排版（D75）：犯错卡片、对比横条、收起的明细 */
+.behavior-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.behavior-card { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel); }
+.behavior-card.bad { border-color: var(--loss); background: color-mix(in srgb, var(--loss) 7%, var(--panel)); }
+.behavior-card.few { border-style: dashed; }
+.behavior-label { font-size: 12px; color: var(--muted); }
+.behavior-value { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.behavior-card.bad .behavior-value { color: var(--loss); }
+.behavior-card.ok .behavior-value { color: var(--profit); }
+.compare-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 8px; }
+.compare-card { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel); }
+.compare-card p { margin: 4px 0 0; }
+.compare-title { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.compare-row { display: grid; grid-template-columns: minmax(64px, max-content) 1fr 92px; align-items: center; gap: 8px; font-size: 12px; padding: 2px 0; }
+.compare-track { position: relative; height: 8px; border-radius: 4px; background: var(--hover); }
+.compare-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--accent); }
+.compare-fill.profit { background: var(--profit); }
+.compare-fill.loss { background: var(--loss); }
+.compare-fill.few { background: var(--muted); opacity: .45; }
+.compare-overall { position: absolute; top: -3px; bottom: -3px; width: 0; border-left: 1.5px solid var(--text); opacity: .6; }
+.compare-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.review-details { margin-top: 14px; }
+.review-details > summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+
+/* 第 5b-2 阶段：自定义日期范围、下载按钮不可用、静态图连续亏损段提示 */
+.custom-dates { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.custom-dates input[type='date'] { padding: 2px 4px; }
+.button-link.disabled { opacity: 0.45; cursor: not-allowed; }
+.review-streak { margin: 6px 8px 0; padding: 6px 10px; }
+
+/* D72：页面路径（像 Finder 的完整路径），每一级都能点；当前页面带底色、不能点 */
+.page-header.with-crumbs { align-items: flex-start; }
+.page-title { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.page-subtitle { color: var(--muted); font-size: 13px; }
+.page-header .breadcrumb, .breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; font-size: 13px; margin-left: 0; }
+.breadcrumb a, .crumb-current { padding: 2px 8px; border-radius: 4px; }
+.breadcrumb a:hover { background: var(--hover); }
+.crumb-current { background: color-mix(in srgb, var(--accent) 14%, var(--panel)); color: var(--text); font-weight: 600; }
+.crumb-sep { color: var(--muted); padding: 0 2px; }
+.back-button { padding: 4px 12px; border: 1px solid var(--accent); border-radius: 4px; color: var(--accent); background: var(--panel); white-space: nowrap; }
+.back-button:hover { background: color-mix(in srgb, var(--accent) 10%, var(--panel)); }
+.review-bar .breadcrumb { flex-wrap: nowrap; }
+
+/* D72：币安下单面板的杠杆设置和 USDT 数量单位 */
+.leverage-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.leverage-button { padding: 2px 8px; }
+.leverage-button b { color: var(--accent); }
+.leverage-editor { border: 1px solid var(--border); border-radius: 6px; padding: 6px; background: var(--bg); display: flex; flex-direction: column; gap: 6px; }
+.leverage-presets { display: flex; flex-wrap: wrap; gap: 4px; }
+.leverage-presets button { flex: 1; padding: 2px 0; }
+.leverage-presets button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.leverage-input { display: flex; align-items: center; gap: 4px; }
+.leverage-input input { width: 64px; }
+.qty-unit { margin-top: 2px; }
+.qty-unit button { font-size: 11px; }
+.size-summary b { color: var(--text); }
+
+/* D73：用户页「开始练习」——左边品种、周期、开始（主角）；右边高级设置常开，浅色小字（一般不用改） */
+.start-layout { display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: flex-start; }
+.start-main { flex: 1 1 360px; min-width: 0; }
+/* D86：品种、周期下面的「可练数据 / 约可练几轮」一行 */
+.capacity-line { font-size: 13px; margin: 2px 0 10px; line-height: 1.6; }
+.start-advanced { flex: 1 1 380px; min-width: 0; padding: 8px 14px; border-left: 2px solid var(--border); font-size: 12px; color: var(--muted); }
+.start-advanced h3 { margin: 0 0 4px; font-size: 13px; font-weight: 500; color: var(--muted); }
+.start-advanced h3 .muted { font-weight: 400; margin-left: 6px; font-size: 12px; }
+.start-advanced .form-row { margin: 6px 0; gap: 6px 8px; }
+.start-advanced .form-row > label:first-child { width: 60px; }
+.start-advanced input { width: 90px; font-size: 12px; padding: 2px 6px; color: var(--muted); }
+.start-advanced .segmented button { font-size: 11px; padding: 2px 6px; }
+
+/* D73：进步曲线卡片分三排（结果 / 风险 / 纪律）、名称放大；轮次不足 5 轮时标题下一行醒目提示 */
+.few-rounds-note { margin: 6px 0 10px; padding: 8px 12px; border-radius: 6px; font-size: 15px; font-weight: 600;
+  color: #8a5300; background: color-mix(in srgb, #f5a623 16%, var(--panel)); border: 1px solid #f5a623; }
+.kpi-section { margin-top: 12px; }
+.kpi-section-title { margin: 0 0 6px; font-size: 14px; font-weight: 600; color: var(--text); }
+.kpi-section .kpi-grid { margin-top: 0; }
+.kpi-label { font-size: 14px; color: var(--text); font-weight: 500; }
+
+/* D73：照 MT4 测试报告排版的统计表——三列「名称：数值」，名称右对齐、数值左对齐 */
+.mt4-table { width: 100%; border-collapse: collapse; margin: 10px 0 4px; font-variant-numeric: tabular-nums; }
+.mt4-table th { text-align: right; font-weight: 500; color: var(--muted); padding: 4px 6px 4px 12px; white-space: nowrap; width: 16%; }
+.mt4-table td { text-align: left; padding: 4px 14px 4px 2px; font-weight: 600; width: 17%; }
+.mt4-table tr:nth-child(3) td, .mt4-table tr:nth-child(5) td { padding-bottom: 10px; }
+.mt4-extra-title { font-size: 13px; margin: 12px 0 6px; }
+.mt4-scroll { overflow-x: auto; }
+/* D78：持仓表盈亏格里「已平 +x」的灰字 */
+.closed-part { margin-left: 6px; font-weight: normal; white-space: nowrap; }
+/* D79：历史练习的品种标签和统计入口 */
+.symbol-tabs button { padding: 3px 12px; }
+.button-link.strong { color: var(--accent); border-color: var(--accent); font-weight: 600; }
+/* D80：市价单排队时的反馈——按钮下的说明、持仓面板的灰色行、2 秒短提示 */
+.queued-note { margin-top: 4px; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel)); }
+.queued-row td { color: var(--muted); font-style: italic; }
+.toast.flash { top: 76px; background: var(--accent); pointer-events: none; }

@@ -1,0 +1,11 @@
+# Python 依赖（版本全部锁定；支持 Python 3.11–3.13）
+# 安装：python -m pip install -r requirements.txt
+# numpy 锁在 2.3 系列：更新的版本（如 2.5）要求 Python 3.12 以上，VPS 上可能只有 3.11
+numpy==2.3.5
+pandas==3.0.6
+pyarrow==26.0.0
+requests==2.34.2
+fastapi==0.153.0
+uvicorn[standard]==0.54.0
+# 仅开发和测试用
+pytest==9.1.1

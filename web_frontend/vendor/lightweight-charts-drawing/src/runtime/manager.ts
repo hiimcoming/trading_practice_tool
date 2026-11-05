@@ -1,0 +1,1004 @@
+/*
+ * DrawingManager — the library runtime (port phase 3.3): TradingView-style
+ * drawing tools on a lightweight-charts chart, built on the shared core
+ * (src/core). One series primitive draws every drawing, the placement preview
+ * and the anchors in one canvas pass (scene -> canvas); the pointer / key
+ * gestures reproduce OpenTrader's overlay with the core interaction functions
+ * (placement, magnet, Shift constraints, anchor / body drags, hit tests).
+ *
+ * The host keeps what is not drawing logic: undo stack, storage, settings
+ * dialogs, inline text / table editors, toolbar, context menu. It listens to
+ * the events and calls the methods.
+ */
+import type { IChartApi, ISeriesApi, ISeriesPrimitive, ISeriesPrimitiveAxisView, IPrimitivePaneRenderer, IPrimitivePaneView, PrimitiveHoveredItem, SeriesAttachedParameter, SeriesType, Time } from "lightweight-charts";
+import type { CanvasRenderingTarget2D } from "fancy-canvas";
+import type { HitResult, Pt } from "../core/_shared";
+import type { Coords, OHLC } from "../core/coords";
+import { isVisibleOnInterval, type DataPoint, type Drawing, type DrawingKind, type NewDrawing } from "../core/types";
+import { defaultStyleFor, findOverlaySpec, type OverlaySpec } from "../core/specs";
+import { hitTestKind } from "../core/kinds/hit-tests";
+import { signpostPositionFor } from "../core/kinds/signpost";
+import { drawingAxisLabels } from "../core/kinds/axis-labels";
+import { tableCanRemove, tableEdgeOf, tableInsert, tableLayout, tableRemove, tableWithText, type TableCellRef, type TableUi } from "../core/kinds/table";
+import { drawingImageFailed, imageInitialSize, onImagesChanged } from "../core/kinds/images";
+import { sceneLockedAnchors, sceneOf } from "../core/scene";
+import type { Scene } from "../core/scene/types";
+import { parseDrawings } from "../core/serialize";
+import { DRAG_THRESHOLD, FREEHAND_SAMPLE_PX, MIN_DISTANCE_BETWEEN_POINTS } from "../core/interact/constants";
+import { magnetSnap, projectAll, projectPoint, screenPoints, translateDrawing, unproject } from "../core/interact/project";
+import { buildNewDrawing, finishPlacement, SEGMENT_PREVIEW_KINDS, snapGannSquare } from "../core/interact/placement";
+import { lockAxisDelta, shiftPlacementPoint } from "../core/interact/shift";
+import { anchorCursor, applyDrag, type DragState } from "../core/interact/drag";
+import { toggleAnchored as toggleAnchoredDrawing } from "../core/interact/anchor";
+import { makeCoords, type FutureAxis } from "./coords";
+import { drawScene } from "./scene-canvas";
+
+export type MagnetMode = "off" | "weak" | "strong";
+
+export type DrawingManagerOptions = {
+  /** The bars of the series (magnet, data-driven tools, positions). Default:
+   *  the series data (OHLC series; line series use `value` for all four). */
+  bars?: () => OHLC[];
+  /** Chart font for the drawings' text. Default: the chart layout font. */
+  fontFamily?: string;
+  /** Magnet (TV weak / strong OHLC snap). Default "off". */
+  magnet?: MagnetMode;
+  /** Chart interval for the per-interval visibility of drawings (TV
+   *  Visibility tab), e.g. "30", "1D". Unset = every drawing shown. */
+  interval?: string;
+  /** Time zone / intraday flag for dates in labels. Default UTC, intraday. */
+  timeInfo?: () => { timeZone: string; intraday: boolean };
+  /** Keep the tool armed after a placement (TV "Keep drawing"). */
+  stayInDrawingMode?: boolean;
+  /** 【本项目改动 2026-10-20】宿主提供的交易日历（未来与更早的 K 线开盘时刻），传给 makeCoords。
+   *  上游 0.6.2 的 DrawingManager 没有把它接进来，右侧未来区只能按中位间隔推算（跨周末会错位）。
+   *  不提供时行为与上游完全相同。 */
+  future?: () => FutureAxis | null;
+};
+
+export type DrawingManagerEvents = {
+  /** The drawing list changed (add / update / remove / import / clear). */
+  change: (drawings: readonly Drawing[]) => void;
+  add: (d: Drawing) => void;
+  update: (d: Drawing, prev: Drawing) => void;
+  remove: (d: Drawing) => void;
+  selection: (ids: readonly string[]) => void;
+  /** The armed tool changed (null = none). */
+  tool: (kind: DrawingKind | null) => void;
+  /** Every drawing was hidden or shown again (setDrawingsVisible, or a tool
+   *  armed while they were hidden). */
+  visibility: (visible: boolean) => void;
+  /** A text tool was placed (or double-clicked): the host opens its editor
+   *  at `screen` (pane coordinates) and calls update with the text. */
+  textEdit: (d: Drawing, screen: Pt) => void;
+  /** A drag / placement gesture ended (undo coalescing). */
+  gestureEnd: () => void;
+  /** A click on a cell of a selected table (TV in-place editing): the host
+   *  opens its editor over `box` (pane coordinates) and calls
+   *  setTableCellText; endTableEdit when it closes. */
+  tableEdit: (d: Drawing, cell: TableCellRef, box: { left: number; top: number; width: number; height: number }) => void;
+};
+
+export type TableOp = "insert-column" | "insert-row" | "remove-row" | "remove-column";
+
+type Listeners = { [K in keyof DrawingManagerEvents]: Set<DrawingManagerEvents[K]> };
+
+/** Drag state of a pointer gesture on a drawing (the core DragState plus the
+ *  gesture's selection bookkeeping). */
+type Gesture = DragState & { canDrag: boolean };
+
+const newId = () => `dw_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+
+export class DrawingManager {
+  private readonly chart: IChartApi;
+  private readonly series: ISeriesApi<SeriesType>;
+  private readonly opts: DrawingManagerOptions;
+  private readonly coords: Coords;
+  private readonly primitive: DrawingsPrimitive;
+  private readonly el: HTMLElement;
+  private readonly listeners: Listeners = { change: new Set(), add: new Set(), update: new Set(), remove: new Set(), selection: new Set(), tool: new Set(), visibility: new Set(), textEdit: new Set(), gestureEnd: new Set(), tableEdit: new Set() };
+  private list: Drawing[] = [];
+  private selected: string[] = [];
+  /** TV "Hide all drawings": off = nothing is drawn or hit (not saved). */
+  private visible = true;
+  private hovered: { id: string; anchor: number } | null = null;
+  private spec: OverlaySpec | null = null;
+  private glyph: string | undefined;
+  private pending: DataPoint[] = [];
+  private cursor: Pt | null = null;
+  private gesture: Gesture | null = null;
+  /** TV table UI of the selected table: active cell, open editor, hovered
+   *  resize edge. */
+  private tableUi: TableUi | null = null;
+  /** Cursor over the hovered drawing (TV: pointer, move when selected,
+   *  resize cursors on anchors and table edges), null = the chart's own. */
+  private hoverCursor: string | null = null;
+  private shift = false;
+  private ctrl = false;
+  private savedScroll: { handleScroll: unknown; handleScale: unknown } | null = null;
+  private readonly off: (() => void)[] = [];
+
+  constructor(chart: IChartApi, series: ISeriesApi<SeriesType>, opts: DrawingManagerOptions = {}) {
+    this.chart = chart;
+    this.series = series;
+    this.opts = { magnet: "off", ...opts };
+    const bars = opts.bars ?? (() => seriesBars(series));
+    this.coords = makeCoords(chart, series, bars, () => [], opts.timeInfo, opts.future);
+    this.primitive = new DrawingsPrimitive(this);
+    series.attachPrimitive(this.primitive as ISeriesPrimitive<Time>);
+    this.el = chart.chartElement();
+    this.listen(this.el, "pointerdown", (e) => this.onPointerDown(e as PointerEvent), true);
+    this.listen(this.el, "pointermove", (e) => this.onHover(e as PointerEvent));
+    this.listen(this.el, "pointerleave", () => { this.hoverCursor = null; this.setHover(null); });
+    this.listen(this.el, "dblclick", (e) => this.onDoubleClick(e as MouseEvent), true);
+    this.listen(window, "keydown", (e) => this.onKey(e as KeyboardEvent));
+    this.listen(window, "keyup", (e) => this.onKey(e as KeyboardEvent));
+    this.listen(window, "blur", () => { this.shift = false; this.ctrl = false; });
+    // Images load asynchronously (core image cache, filled by the host's
+    // reader): redraw, and drop an image drawing whose file failed (TV).
+    this.off.push(onImagesChanged(() => {
+      for (const d of this.list) if (d.kind === "image" && drawingImageFailed(d.image?.name)) this.remove(d.id);
+      this.redraw();
+    }));
+  }
+
+  // ── public API ────────────────────────────────────────────────────────────
+
+  // One overload per event: the generic form alone (cb: Events[K]) made tsc
+  // build a contextual signature from all callbacks, whose Drawing
+  // parameters intersect into a union too large (TS2590) at a consumer's
+  // first on() call.
+  on(event: "change", cb: DrawingManagerEvents["change"]): () => void;
+  on(event: "add", cb: DrawingManagerEvents["add"]): () => void;
+  on(event: "update", cb: DrawingManagerEvents["update"]): () => void;
+  on(event: "remove", cb: DrawingManagerEvents["remove"]): () => void;
+  on(event: "selection", cb: DrawingManagerEvents["selection"]): () => void;
+  on(event: "tool", cb: DrawingManagerEvents["tool"]): () => void;
+  on(event: "visibility", cb: DrawingManagerEvents["visibility"]): () => void;
+  on(event: "textEdit", cb: DrawingManagerEvents["textEdit"]): () => void;
+  on(event: "gestureEnd", cb: DrawingManagerEvents["gestureEnd"]): () => void;
+  on(event: "tableEdit", cb: DrawingManagerEvents["tableEdit"]): () => void;
+  on<K extends keyof DrawingManagerEvents>(event: K, cb: DrawingManagerEvents[K]): () => void {
+    (this.listeners[event] as Set<DrawingManagerEvents[K]>).add(cb);
+    return () => (this.listeners[event] as Set<DrawingManagerEvents[K]>).delete(cb);
+  }
+
+  /** Arm a tool (a DrawingKind of the core specs) or disarm (null). `glyph`:
+   *  the font-icon glyph to place. */
+  setTool(kind: DrawingKind | null, o: { glyph?: string } = {}): void {
+    const spec = kind ? findOverlaySpec(kind) ?? null : null;
+    // A tool armed while the drawings are hidden shows them again: the new
+    // drawing would be invisible otherwise.
+    if (spec) this.setDrawingsVisible(true);
+    this.spec = spec;
+    this.glyph = o.glyph;
+    this.pending = [];
+    this.cursor = null;
+    this.emit("tool", spec ? spec.kind : null);
+    this.redraw();
+  }
+  tool(): DrawingKind | null {
+    return this.spec?.kind ?? null;
+  }
+  setMagnet(mode: MagnetMode): void {
+    this.opts.magnet = mode;
+  }
+  setInterval(interval: string | undefined): void {
+    this.opts.interval = interval;
+    this.dropHidden();
+    this.redraw();
+  }
+  /** TV "Hide all drawings": hide / show every drawing without touching
+   *  them (the drawings' own `hidden` flag and the saved JSON stay as they
+   *  are). Hiding disarms the tool and clears the selection. */
+  setDrawingsVisible(visible: boolean): void {
+    if (this.visible === visible) return;
+    this.visible = visible;
+    if (!visible) {
+      if (this.spec) this.setTool(null);
+      this.dropHidden();
+    }
+    this.emit("visibility", visible);
+    this.redraw();
+  }
+  drawingsVisible(): boolean {
+    return this.visible;
+  }
+  setStayInDrawingMode(on: boolean): void {
+    this.opts.stayInDrawingMode = on;
+  }
+
+  drawings(): readonly Drawing[] {
+    return this.list;
+  }
+  get(id: string): Drawing | undefined {
+    return this.list.find((d) => d.id === id);
+  }
+  /** Add a drawing (default style of its kind when none); returns its id. */
+  add(nd: NewDrawing | Drawing): string {
+    const d = { id: newId(), style: defaultStyleFor(nd.kind), ...nd } as Drawing;
+    this.list = [...this.list, d];
+    this.emit("add", d);
+    this.changed();
+    return d.id;
+  }
+  update(d: Drawing): void {
+    const prev = this.get(d.id);
+    if (!prev) return;
+    this.list = this.list.map((x) => (x.id === d.id ? d : x));
+    this.dropHidden();
+    this.emit("update", d, prev);
+    this.changed();
+  }
+  /** Hide / show one drawing (its `hidden` flag, saved with it): a hidden
+   *  drawing is not drawn, hit or selected. */
+  setHidden(id: string, hidden: boolean): void {
+    const d = this.get(id);
+    if (!d || !!d.hidden === hidden) return;
+    this.update({ ...d, hidden } as Drawing);
+  }
+  remove(id: string): void {
+    const d = this.get(id);
+    if (!d) return;
+    this.list = this.list.filter((x) => x.id !== id);
+    if (this.selected.includes(id)) this.select(this.selected.filter((x) => x !== id));
+    this.emit("remove", d);
+    this.changed();
+  }
+  clear(): void {
+    this.list = [];
+    this.select([]);
+    this.changed();
+  }
+  /** Z-order (TV Visual order): the list order is the draw order. */
+  bringToFront(id: string): void {
+    this.reorder(id, this.list.length - 1);
+  }
+  sendToBack(id: string): void {
+    this.reorder(id, 0);
+  }
+
+  select(ids: readonly string[]): void {
+    this.selected = ids.filter((id) => this.get(id));
+    if (this.tableUi && !this.selected.includes(this.tableUi.id)) this.tableUi = null;
+    this.emit("selection", this.selected);
+    this.redraw();
+  }
+  selection(): readonly string[] {
+    return this.selected;
+  }
+
+  /** TV image: placed at the pane centre at its initial size (a quarter of
+   *  the pane at most) and selected. The file must be known to the core
+   *  image cache (cacheImage / setImageReader) under `name`. */
+  addImage(img: { name: string; width: number; height: number; transparency?: number }): string | null {
+    const { w, h } = this.paneSize();
+    const dp = unproject(this.coords, { x: w / 2, y: h / 2 });
+    if (!dp) return null;
+    const style = defaultStyleFor("image");
+    const id = this.add({
+      kind: "image",
+      points: [dp],
+      image: { name: img.name, ...imageInitialSize(img.width, img.height, w, h) },
+      style: { ...style, transparency: img.transparency ?? style.transparency },
+    } as NewDrawing);
+    this.select([id]);
+    return id;
+  }
+
+  /** TV "Anchor drawing" (text, pin, table): an anchored drawing keeps its
+   *  pane position when the chart scrolls; toggling back turns it into a
+   *  time / price point again. Returns whether the drawing changed. */
+  toggleAnchored(id: string): boolean {
+    const d = this.get(id);
+    if (!d) return false;
+    const next = toggleAnchoredDrawing(d, this.coords, this.paneSize());
+    if (!next) return false;
+    this.update(next);
+    this.emit("gestureEnd");
+    return true;
+  }
+
+  /** The table UI state (active cell, editor open, hovered edge) or null. */
+  tableState(): TableUi | null {
+    return this.tableUi;
+  }
+  setTableCellText(id: string, cell: TableCellRef, text: string): void {
+    const d = this.get(id);
+    if (d?.kind !== "table") return;
+    this.update({ ...d, style: { ...d.style, ...tableWithText(d.style, cell, text) } } as Drawing);
+  }
+  /** The cell editor closed (the cell stays active). */
+  endTableEdit(): void {
+    if (this.tableUi) this.tableUi = { ...this.tableUi, editing: false };
+    this.redraw();
+  }
+  /** TV table context actions on the active cell (insert after it, or at the
+   *  end without one; remove its row / column). */
+  tableOp(id: string, op: TableOp): void {
+    const d = this.get(id);
+    if (d?.kind !== "table") return;
+    const cell = this.tableUi?.id === id ? this.tableUi.cell : null;
+    if (op === "insert-column" || op === "insert-row") {
+      this.update({ ...d, style: { ...d.style, ...tableInsert(d.style, op === "insert-row" ? "row" : "column", cell) } } as Drawing);
+    } else {
+      const kind = op === "remove-row" ? "row" : "column";
+      if (!cell || !tableCanRemove(d.style, kind)) return;
+      const r = tableRemove(d.style, kind, cell);
+      this.update({ ...d, style: { ...d.style, ...r.patch } } as Drawing);
+      this.tableUi = { id, cell: r.cell, editing: this.tableUi?.editing ?? false, edge: null };
+    }
+    this.emit("gestureEnd");
+  }
+
+  /** The drawings as JSON (the core Drawing model). */
+  exportJSON(): string {
+    return JSON.stringify(this.list);
+  }
+  /** Replace the drawings from JSON (string or parsed): entries are checked
+   *  and migrated (core parseDrawings); returns how many were loaded. */
+  importJSON(json: string | unknown): number {
+    const parsed = typeof json === "string" ? JSON.parse(json) : json;
+    this.list = parseDrawings(parsed);
+    this.select([]);
+    this.changed();
+    return this.list.length;
+  }
+
+  /** Redraw on the next frame (the chart repaints the primitive). */
+  redraw(): void {
+    this.primitive.requestUpdate();
+  }
+
+  destroy(): void {
+    this.endGesture();
+    for (const f of this.off) f();
+    this.series.detachPrimitive(this.primitive as ISeriesPrimitive<Time>);
+  }
+
+  // ── rendering (called by the primitive) ─────────────────────────────────
+
+  /** Every visible drawing, then the placement preview, as scenes in pane
+   *  coordinates, with the anchor state of their drawing (TV ring stroke 2
+   *  when selected, the hovered anchor's halo). */
+  scenes(w: number, h: number): { scene: Scene; selected: boolean; hoveredAnchor: number }[] {
+    const out: { scene: Scene; selected: boolean; hoveredAnchor: number }[] = [];
+    const c = this.coords;
+    const pane = { w, h };
+    for (const d of this.list) {
+      if (!this.shown(d)) continue;
+      const pts = screenPoints(c, d, pane);
+      if (!pts) continue;
+      const sel = this.selected.includes(d.id);
+      const hov = this.hovered?.id === d.id && !d.locked;
+      // TV shows a drawing's anchors on hover too; locked drawings and an
+      // armed tool keep hover feedback off.
+      const active = sel || (hov && !this.spec);
+      const tableUi = d.kind === "table" && sel && this.tableUi?.id === d.id ? this.tableUi : null;
+      const scene = sceneOf(d, pts, { w, h, coords: c, selected: active && !d.locked, hovered: hov, textSelected: sel, tableUi });
+      out.push({ scene, selected: sel, hoveredAnchor: hov ? this.hovered!.anchor : -1 });
+      if (sel && d.locked) out.push({ scene: sceneLockedAnchors(pts, d.style.color), selected: sel, hoveredAnchor: -1 });
+    }
+    const p = this.previewScene(w, h);
+    if (p) out.push({ scene: p, selected: false, hoveredAnchor: -1 });
+    return out;
+  }
+  /** Axis labels of the visible drawings (core drawingAxisLabels) as
+   *  lightweight-charts axis views: prices formatted by the series, times by
+   *  the chart's time formatter. */
+  axisViews(): { price: ISeriesPrimitiveAxisView[]; time: ISeriesPrimitiveAxisView[] } {
+    const price: ISeriesPrimitiveAxisView[] = [];
+    const time: ISeriesPrimitiveAxisView[] = [];
+    const c = this.coords;
+    const pane = this.paneSize();
+    const fmt = this.series.priceFormatter();
+    for (const d of this.list) {
+      if (!this.shown(d)) continue;
+      const pts = screenPoints(c, d, pane);
+      if (!pts) continue;
+      const l = drawingAxisLabels(d, pts, c);
+      for (const p of l.price) {
+        const y = c.priceToY(p.price);
+        if (y != null) price.push(axisView(y, fmt.format(p.price), p.back, p.color));
+      }
+      for (const t of l.time) {
+        const x = c.timeToX(t.time);
+        if (x != null) time.push(axisView(x, c.formatTime(t.time), t.back, t.color));
+      }
+    }
+    return { price, time };
+  }
+  /** The cursor at a pane point, for the primitive hitTest (lightweight-
+   *  charts shows it): crosshair while a tool is armed, the hovered
+   *  drawing's cursor, else null (the chart's own). */
+  hoveredId(): string | null {
+    return this.hovered?.id ?? null;
+  }
+  cursorAt(): string | null {
+    if (this.spec) return "crosshair";
+    if (this.gesture?.active) return this.gesture.mode.hit === "body" ? "move" : this.hoverCursor;
+    return this.hoverCursor;
+  }
+  fontFamily(): string {
+    return this.opts.fontFamily ?? this.chart.options().layout.fontFamily;
+  }
+  /** Chart background at a y (the anchor fill). */
+  backgroundAt(y: number, h: number): string {
+    const bg = this.chart.options().layout.background as { type?: string; color?: string; topColor?: string; bottomColor?: string };
+    if (bg.type === "gradient" && bg.topColor && bg.bottomColor) return mixHex(bg.topColor, bg.bottomColor, h > 0 ? Math.max(0, Math.min(1, y / h)) : 0);
+    return bg.color ?? "#ffffff";
+  }
+
+  // ── internals ─────────────────────────────────────────────────────────────
+
+  private listen(t: EventTarget, type: string, f: (e: Event) => void, capture = false): void {
+    t.addEventListener(type, f, capture);
+    this.off.push(() => t.removeEventListener(type, f, capture));
+  }
+  private emit<K extends keyof DrawingManagerEvents>(event: K, ...args: Parameters<DrawingManagerEvents[K]>): void {
+    for (const cb of this.listeners[event]) (cb as (...a: unknown[]) => void)(...args);
+  }
+  private changed(): void {
+    this.emit("change", this.list);
+    this.redraw();
+  }
+  private reorder(id: string, to: number): void {
+    const i = this.list.findIndex((d) => d.id === id);
+    if (i < 0) return;
+    const next = this.list.slice();
+    const [d] = next.splice(i, 1);
+    next.splice(Math.max(0, Math.min(next.length, to)), 0, d);
+    this.list = next;
+    this.changed();
+  }
+  private shown(d: Drawing): boolean {
+    return this.visible && !d.hidden && (this.opts.interval == null || isVisibleOnInterval(d.visibility, this.opts.interval));
+  }
+  /** Drawings that are no longer shown leave the selection and the hover:
+   *  Delete must not remove a drawing the user cannot see. */
+  private dropHidden(): void {
+    const isShown = (id: string) => { const d = this.get(id); return !!d && this.shown(d); };
+    if (this.hovered && !isShown(this.hovered.id)) {
+      this.hovered = null;
+      this.hoverCursor = null;
+    }
+    if (!this.selected.every(isShown)) this.select(this.selected.filter(isShown));
+  }
+  private paneSize(): { w: number; h: number } {
+    const idx = this.series.getPane().paneIndex();
+    const s = this.chart.paneSize(idx);
+    return { w: s.width, h: s.height };
+  }
+  /** Pointer position in pane coordinates. */
+  private panePoint(e: MouseEvent): Pt {
+    const paneEl = this.series.getPane().getHTMLElement();
+    const r = (paneEl ?? this.el).getBoundingClientRect();
+    const left = this.chart.priceScale("left").width();
+    const chartLeft = this.el.getBoundingClientRect().left;
+    return { x: e.clientX - chartLeft - left, y: e.clientY - r.top };
+  }
+  private magnet(): { enabled: boolean; mode: "weak" | "strong" } {
+    const m = this.opts.magnet ?? "off";
+    const mode = m === "strong" ? "strong" : "weak";
+    // TV (magnet module 32742): Shift turns it off once a tool is being
+    // created (after the first point) or an anchor is dragged; Ctrl / Cmd
+    // inverts it (off -> strong).
+    const busy = this.pending.length > 0 || (!!this.gesture?.active && this.gesture.mode.hit === "handle");
+    if (this.shift && busy) return { enabled: false, mode };
+    if (this.ctrl) return { enabled: m === "off", mode: "strong" };
+    return { enabled: m !== "off", mode };
+  }
+  private snapFn(): (p: DataPoint) => DataPoint {
+    const m = this.magnet();
+    const c = this.coords;
+    return m.enabled ? (p) => magnetSnap(p, c, m.mode, false) ?? p : (p) => p;
+  }
+  private dataAt(p: Pt): DataPoint | null {
+    const dp = unproject(this.coords, p);
+    return dp ? this.snapFn()(dp) : null;
+  }
+  /** The magnet-snapped aim point of the preview (x and y lock onto the
+   *  candle when the magnet engages). */
+  private aimAt(cur: Pt): Pt {
+    const m = this.magnet();
+    if (!m.enabled) return cur;
+    const dp = unproject(this.coords, cur);
+    const snapped = dp ? magnetSnap(dp, this.coords, m.mode, false) : null;
+    return (snapped && projectPoint(this.coords, snapped)) || cur;
+  }
+
+  private hitTopmost(sp: Pt): { drawing: Drawing; mode: HitResult; pts: Pt[] } | null {
+    const { w, h } = this.paneSize();
+    // Drawings are clipped to the pane (TV): nothing hits over the axes.
+    if (sp.x < 0 || sp.x > w || sp.y < 0 || sp.y > h) return null;
+    for (let i = this.list.length - 1; i >= 0; i--) {
+      const d = this.list[i];
+      if (!this.shown(d)) continue;
+      const pts = screenPoints(this.coords, d, { w, h });
+      if (!pts) continue;
+      const r = hitTestKind(d, pts, sp, w, h, this.coords, this.selected.includes(d.id));
+      if (r) return { drawing: d, mode: r, pts };
+    }
+    return null;
+  }
+
+  private setHover(h: { id: string; anchor: number } | null): void {
+    if (this.hovered?.id === h?.id && this.hovered?.anchor === h?.anchor) return;
+    this.hovered = h;
+    this.redraw();
+  }
+
+  /** Take the pointer gesture from the chart: no pan / zoom until release. */
+  private holdChart(): void {
+    if (this.savedScroll) return;
+    // options() returns live objects: copy them before switching off.
+    const o = this.chart.options() as unknown as { handleScroll: unknown; handleScale: unknown };
+    this.savedScroll = { handleScroll: structuredClone(o.handleScroll), handleScale: structuredClone(o.handleScale) };
+    this.chart.applyOptions({ handleScroll: false, handleScale: false });
+  }
+  private releaseChart(): void {
+    if (!this.savedScroll) return;
+    this.chart.applyOptions(this.savedScroll as never);
+    this.savedScroll = null;
+  }
+
+  private onKey(e: KeyboardEvent): void {
+    const down = e.type === "keydown";
+    if (e.key === "Shift") this.shift = down;
+    else if (e.key === "Control" || e.key === "Meta") this.ctrl = down;
+    if (!down) return;
+    const t = e.target as HTMLElement | null;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+    if (e.key === "Escape") {
+      // TV cascade: pending points -> the armed tool -> the selection.
+      if (this.pending.length) {
+        this.pending = [];
+        this.redraw();
+      } else if (this.spec) this.setTool(null);
+      else if (this.selected.length) this.select([]);
+      else return;
+      e.preventDefault();
+    } else if ((e.key === "Delete" || e.key === "Backspace") && this.selected.length) {
+      const ids = this.selected.filter((id) => !this.get(id)?.locked);
+      if (!ids.length) return;
+      for (const id of ids) this.remove(id);
+      e.preventDefault();
+    }
+  }
+
+  private onHover(e: PointerEvent): void {
+    if (this.gesture || e.buttons) return;
+    const sp = this.panePoint(e);
+    if (this.spec) {
+      this.cursor = sp;
+      this.redraw();
+      return;
+    }
+    const hit = this.hitTopmost(sp);
+    this.setHover(hit ? { id: hit.drawing.id, anchor: hit.mode.hit === "handle" ? hit.mode.handleIndex : -1 } : null);
+    // TV table: the hovered row / column edge of the selected table.
+    const edge = hit?.drawing.kind === "table" && hit.mode.hit === "handle" ? tableEdgeOf(hit.mode.handleIndex) : null;
+    const ui = this.tableUi;
+    if (hit?.drawing.kind === "table" && this.selected.includes(hit.drawing.id)) {
+      if ((ui?.edge?.row ?? -1) !== (edge?.row ?? -1) || (ui?.edge?.col ?? -1) !== (edge?.col ?? -1) || ui?.id !== hit.drawing.id) {
+        this.tableUi = ui && ui.id === hit.drawing.id ? { ...ui, edge } : { id: hit.drawing.id, cell: null, editing: false, edge };
+        this.redraw();
+      }
+    } else if (ui?.edge) {
+      this.tableUi = { ...ui, edge: null };
+      this.redraw();
+    }
+    this.hoverCursor = !hit
+      ? null
+      : hit.drawing.locked
+        ? "default"
+        : edge
+          ? edge.col != null && edge.row != null ? "default" : edge.col != null ? "ew-resize" : "ns-resize"
+          : hit.mode.hit === "handle"
+            ? anchorCursor(hit.pts[hit.mode.handleIndex] ?? sp, hit.pts)
+            : this.selected.includes(hit.drawing.id) ? "move" : "pointer";
+  }
+
+  private onPointerDown(e: PointerEvent): void {
+    if (e.button !== 0) return;
+    const sp = this.panePoint(e);
+    const { w, h } = this.paneSize();
+    if (sp.x < 0 || sp.x > w || sp.y < 0 || sp.y > h) return;
+    if (this.spec) {
+      e.stopPropagation();
+      this.holdChart();
+      if (this.spec.freehand) this.startFreehand(sp);
+      else {
+        this.placementClick(sp);
+        window.addEventListener("pointerup", () => this.releaseChart(), { once: true });
+      }
+      return;
+    }
+    this.selectionDown(e, sp);
+  }
+
+  private onDoubleClick(e: MouseEvent): void {
+    // Variable-length tools (polyline / path / ghost feed): a double-click
+    // finishes the drawing.
+    if (this.spec?.variableLength) {
+      e.stopPropagation();
+      this.finishVariable(false);
+      return;
+    }
+    if (this.spec) return;
+    const hit = this.hitTopmost(this.panePoint(e));
+    if (hit && findOverlaySpec(hit.drawing.kind)?.textEditable) {
+      e.stopPropagation();
+      this.emit("textEdit", hit.drawing, textAnchor(hit.drawing, hit.pts));
+    }
+  }
+
+  private placementClick(spRaw: Pt): void {
+    const spec = this.spec!;
+    // TV image: placed by the host (file dialog), not by a click.
+    if (spec.kind === "image") return;
+    const sp = spRaw;
+    const pend = this.pending;
+    const c = this.coords;
+    // Variable length (TV addPoint): a click on the last vertex finishes, on
+    // the first vertex of a polyline closes it.
+    if (spec.variableLength && pend.length >= 1) {
+      const near = (v: DataPoint) => {
+        const p = projectPoint(c, v);
+        return !!p && Math.hypot(p.x - sp.x, p.y - sp.y) < MIN_DISTANCE_BETWEEN_POINTS;
+      };
+      if (near(pend[pend.length - 1])) {
+        if (pend.length >= 2) this.finishVariable(false);
+        return;
+      }
+      if (spec.kind === "polyline" && pend.length >= 2 && near(pend[0])) {
+        this.finishVariable(true);
+        return;
+      }
+    }
+    const dp0 = this.dataAt(sp);
+    if (!dp0) return;
+    // Shift: the TV per-tool placement rule (45° against the previous point,
+    // square, Gann fixed increments; the ellipse ends as a circle).
+    const sh = this.shift ? shiftPlacementPoint(spec.kind, pend, dp0, c) : { point: dp0 };
+    const dp = sh.point;
+    const next = sh.extra ? [...pend, dp, sh.extra] : [...pend, dp];
+    if (spec.variableLength || next.length < spec.pointCount) {
+      this.pending = next;
+      this.cursor = sp;
+      this.redraw();
+      return;
+    }
+    const { w, h } = this.paneSize();
+    let placed = finishPlacement(spec.kind, next, c, { w, h }, { glyph: this.glyph });
+    // TV signpost addPoint: the click height sets the label position.
+    if (placed && spec.kind === "signpost") {
+      placed = { ...placed, style: { ...defaultStyleFor("signpost"), signpostPosition: signpostPositionFor(c, next[0], h) } } as NewDrawing;
+    }
+    this.pending = [];
+    this.cursor = null;
+    if (placed) this.placeNew(placed, spec.textEditable ? sp : null);
+    else this.afterPlacement();
+  }
+
+  private finishVariable(closed: boolean): void {
+    const spec = this.spec;
+    if (!spec?.variableLength || this.pending.length < 2) return;
+    const { w, h } = this.paneSize();
+    const placed = finishPlacement(spec.kind, this.pending, this.coords, { w, h }, { closed });
+    this.pending = [];
+    this.cursor = null;
+    if (placed) this.placeNew(placed, null);
+    else this.afterPlacement();
+  }
+
+  /** TV selects every new drawing once placed; text tools ask the host for
+   *  their editor. */
+  private placeNew(nd: NewDrawing, textAt: Pt | null): void {
+    const id = this.add(nd);
+    if (!this.opts.stayInDrawingMode) this.select([id]);
+    const d = this.get(id);
+    if (d && textAt) this.emit("textEdit", d, textAt);
+    this.afterPlacement();
+  }
+  private afterPlacement(): void {
+    this.emit("gestureEnd");
+    if (!this.opts.stayInDrawingMode) this.setTool(null);
+    else this.redraw();
+  }
+
+  /** Brush / highlighter: press, drag (a vertex every FREEHAND_SAMPLE_PX),
+   *  release commits (no magnet, like TV). */
+  private startFreehand(sp0: Pt): void {
+    const spec = this.spec!;
+    const dp0 = unproject(this.coords, sp0);
+    if (!dp0) return;
+    this.pending = [dp0];
+    this.cursor = sp0;
+    let last = sp0;
+    const move = (ev: PointerEvent) => {
+      const cur = this.panePoint(ev);
+      this.cursor = cur;
+      if (Math.hypot(cur.x - last.x, cur.y - last.y) < FREEHAND_SAMPLE_PX) return;
+      const dp = unproject(this.coords, cur);
+      if (!dp) return;
+      last = cur;
+      this.pending = [...this.pending, dp];
+      this.redraw();
+    };
+    const up = () => {
+      document.removeEventListener("pointermove", move);
+      document.removeEventListener("pointerup", up);
+      this.releaseChart();
+      const pts = this.pending;
+      this.pending = [];
+      this.cursor = null;
+      const placed = pts.length >= 2 ? buildNewDrawing(spec.kind, pts) : null;
+      if (placed) this.placeNew(placed, null);
+      else this.afterPlacement();
+    };
+    document.addEventListener("pointermove", move);
+    document.addEventListener("pointerup", up);
+  }
+
+  private selectionDown(e: PointerEvent, sp: Pt): void {
+    const hit = this.hitTopmost(sp);
+    const multiKey = e.ctrlKey || e.metaKey;
+    if (!hit) {
+      // Ctrl+click on empty space keeps the selection (TV); a plain click
+      // clears it and the chart pans as usual.
+      if (!multiKey && this.selected.length) this.select([]);
+      return;
+    }
+    e.stopPropagation();
+    this.holdChart();
+    const ids = this.selected;
+    const wasSelected = ids.includes(hit.drawing.id);
+    const inGroup = wasSelected && ids.length > 1;
+    if (!multiKey && !wasSelected) this.select([hit.drawing.id]);
+    // Locked drawings can join / leave the selection but never drag.
+    if (hit.drawing.locked) {
+      if (multiKey) this.toggle(hit.drawing.id);
+      else if (inGroup) this.select([hit.drawing.id]);
+      window.addEventListener("pointerup", () => this.releaseChart(), { once: true });
+      return;
+    }
+    const pane = this.paneSize();
+    const group =
+      inGroup && hit.mode.hit === "body"
+        ? ids
+            .map((id) => this.get(id))
+            .filter((d): d is Drawing => !!d && !d.locked && this.shown(d))
+            .map((d) => ({ start: d, startScreen: screenPoints(this.coords, d, pane) }))
+            .filter((m): m is { start: Drawing; startScreen: Pt[] } => !!m.startScreen)
+        : undefined;
+    // TV gates body drags on selection: a press on an unselected drawing's
+    // body only selects it; anchor drags engage at once.
+    this.gesture = {
+      id: hit.drawing.id,
+      start: hit.drawing,
+      startCursor: sp,
+      startScreen: hit.pts,
+      mode: hit.mode,
+      active: false,
+      group,
+      pendingToggle: multiKey,
+      pendingCollapse: !multiKey && inGroup,
+      pane,
+      canDrag: hit.mode.hit === "handle" || wasSelected,
+    };
+    const move = (ev: PointerEvent) => this.dragMove(this.panePoint(ev));
+    const up = () => {
+      document.removeEventListener("pointermove", move);
+      document.removeEventListener("pointerup", up);
+      const g = this.gesture;
+      if (g && !g.active) {
+        if (g.pendingToggle) this.toggle(g.id);
+        else if (g.pendingCollapse) this.select([g.id]);
+        // TV table: a click on a cell of the already selected table makes it
+        // the active cell and opens its editor; a corner anchor clears it.
+        if (g.start.kind === "table" && !multiKey) {
+          if (g.mode.hit === "body" && g.mode.cell && wasSelected) this.openCell(g.start, g.mode.cell);
+          else if (g.mode.hit === "handle" && g.mode.handleIndex < 4 && this.tableUi?.id === g.id) {
+            this.tableUi = { ...this.tableUi, cell: null, editing: false };
+            this.redraw();
+          }
+        }
+      }
+      // TV image endChanging: the centre goes back to its bar.
+      if (g?.active && g.start.kind === "image") {
+        const cur = this.get(g.id);
+        if (cur?.image?.dx != null) {
+          const { dx: _dx, ...im } = cur.image;
+          this.update({ ...cur, image: im } as Drawing);
+        }
+      }
+      this.endGesture();
+      this.emit("gestureEnd");
+    };
+    document.addEventListener("pointermove", move);
+    document.addEventListener("pointerup", up);
+  }
+
+  private dragMove(cur: Pt): void {
+    const g = this.gesture;
+    if (!g) return;
+    if (!g.active) {
+      if (!g.canDrag) return;
+      if (Math.hypot(cur.x - g.startCursor.x, cur.y - g.startCursor.y) < DRAG_THRESHOLD) return;
+      // Ctrl + body drag of a single drawing clones it (TV): the copy stays,
+      // the original moves.
+      if (g.pendingToggle && g.mode.hit === "body" && !g.group) {
+        const { id: _id, ...copy } = g.start;
+        this.add(copy as NewDrawing);
+        this.select([g.id]);
+      }
+      g.active = true;
+      g.pendingToggle = false;
+      g.pendingCollapse = false;
+    }
+    if (g.group) {
+      // Shift: TV H/V lock of the move (./shift lockAxisDelta).
+      const l0 = { dx: cur.x - g.startCursor.x, dy: cur.y - g.startCursor.y };
+      const { dx, dy } = this.shift ? lockAxisDelta(l0.dx, l0.dy) : l0;
+      for (const m of g.group) {
+        const nd = translateDrawing(this.coords, m.start, m.startScreen, dx, dy, this.paneSize());
+        if (nd) this.update(nd);
+      }
+      return;
+    }
+    const updated = applyDrag(g, cur, this.coords, this.snapFn(), this.shift);
+    if (updated) this.update(updated);
+  }
+
+  private endGesture(): void {
+    this.gesture = null;
+    this.releaseChart();
+  }
+
+  private openCell(d: Drawing, cell: TableCellRef): void {
+    this.tableUi = { id: d.id, cell, editing: true, edge: null };
+    this.redraw();
+    const pts = screenPoints(this.coords, d, this.paneSize());
+    if (!pts) return;
+    const L = tableLayout(d, pts[0]);
+    const [r, c] = cell;
+    this.emit("tableEdit", d, cell, { left: L.xs[c], top: L.ys[r], width: L.xs[c + 1] - L.xs[c], height: L.ys[r + 1] - L.ys[r] });
+  }
+
+  private toggle(id: string): void {
+    this.select(this.selected.includes(id) ? this.selected.filter((x) => x !== id) : [...this.selected, id]);
+  }
+
+  /** The live placement preview: the real tool with the cursor standing in
+   *  for the unplaced points (TV), the real freehand stroke, or the segment
+   *  rubber band (patterns, Elliott, variable-length tools). */
+  private previewScene(w: number, h: number): Scene | null {
+    const spec = this.spec;
+    const p = this.pending;
+    const raw = this.cursor;
+    if (!spec || !p.length || !raw) return null;
+    const c = this.coords;
+    const placed = p.map((dp) => projectPoint(c, dp)).filter((x): x is Pt => !!x);
+    if (!placed.length) return null;
+    const style = defaultStyleFor(spec.kind);
+    const cur = this.aimAt(raw);
+    const dots: Scene = placed.map((pt) => ({ t: "circle", cx: pt.x, cy: pt.y, r: 3, fill: style.color }));
+    if (!spec.variableLength && !spec.freehand && !SEGMENT_PREVIEW_KINDS.has(spec.kind) && placed.length === p.length && placed.length < spec.pointCount) {
+      const cur0 = this.dataAt(cur);
+      const sh = cur0 && this.shift ? shiftPlacementPoint(spec.kind, p, cur0, c) : null;
+      const curData = sh ? sh.point : cur0;
+      if (curData) {
+        const full = [...p, curData];
+        if (sh?.extra) full.push(sh.extra);
+        while (full.length < spec.pointCount) full.push(curData);
+        const nd0 = buildNewDrawing(spec.kind, full);
+        const nd = nd0 && spec.kind === "gann-square" ? snapGannSquare(nd0, c) : nd0;
+        const d = nd ? ({ ...nd, id: "__preview__", style } as Drawing) : null;
+        const screen = d ? projectAll(c, d.points) : null;
+        if (d && screen) return [...sceneOf(d, screen, { w, h, coords: c, selected: false }), ...dots];
+      }
+    }
+    if (spec.freehand && placed.length >= 2) {
+      return sceneOf({ id: "__preview__", kind: spec.kind, points: p, style } as Drawing, placed, { w, h, coords: c, selected: false });
+    }
+    const last = placed[placed.length - 1];
+    const out: Scene = [];
+    if (placed.length >= 2) out.push({ t: "polyline", pts: placed, fill: "none", stroke: style.color, strokeWidth: style.width, cap: "round" });
+    out.push({ t: "line", a: last, b: cur, stroke: style.color, strokeWidth: style.width, cap: "round" });
+    return [...out, ...dots];
+  }
+}
+
+/** The editor anchor of a text drawing: the click point, the balloon centre
+ *  (callout / note), the line middle (price note). */
+function textAnchor(d: Drawing, pts: Pt[]): Pt {
+  if ((d.kind === "callout" || d.kind === "note") && pts[1]) return pts[1];
+  if (d.kind === "price-note" && pts[1]) return { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+  return pts[0];
+}
+
+/** OHLC bars of a series from its data (line / area data: value for all). */
+function seriesBars(series: ISeriesApi<SeriesType>): OHLC[] {
+  return series.data().map((b) => {
+    const r = b as { time: Time; open?: number; high?: number; low?: number; close?: number; value?: number; volume?: number };
+    const v = r.value ?? r.close ?? 0;
+    return { time: r.time, open: r.open ?? v, high: r.high ?? v, low: r.low ?? v, close: r.close ?? v, volume: r.volume };
+  }) as OHLC[];
+}
+
+function mixHex(a: string, b: string, t: number): string {
+  const pa = /^#([0-9a-f]{6})$/i.exec(a);
+  const pb = /^#([0-9a-f]{6})$/i.exec(b);
+  if (!pa || !pb) return a;
+  const na = parseInt(pa[1], 16);
+  const nb = parseInt(pb[1], 16);
+  const ch = (sh: number) => Math.round(((na >> sh) & 255) + (((nb >> sh) & 255) - ((na >> sh) & 255)) * t);
+  return "#" + ((ch(16) << 16) | (ch(8) << 8) | ch(0)).toString(16).padStart(6, "0");
+}
+
+function axisView(coordinate: number, text: string, back: string, color: string): ISeriesPrimitiveAxisView {
+  return { coordinate: () => coordinate, text: () => text, backColor: () => back, textColor: () => color, visible: () => true, tickVisible: () => true };
+}
+
+/** The series primitive: one pane view drawing every scene of the manager
+ *  in the pane (clipped to it), above the series, and the drawings' axis
+ *  labels (price / time axis views, rebuilt on every chart update). */
+class DrawingsPrimitive implements ISeriesPrimitive<Time> {
+  private readonly m: DrawingManager;
+  private request: (() => void) | null = null;
+  private readonly view: IPrimitivePaneView;
+
+  constructor(m: DrawingManager) {
+    this.m = m;
+    const renderer: IPrimitivePaneRenderer = { draw: (t) => this.draw(t) };
+    this.view = { zOrder: () => "top", renderer: () => renderer };
+  }
+  attached(p: SeriesAttachedParameter<Time>): void {
+    this.request = p.requestUpdate;
+  }
+  detached(): void {
+    this.request = null;
+  }
+  paneViews(): readonly IPrimitivePaneView[] {
+    return [this.view];
+  }
+  private axis: { price: ISeriesPrimitiveAxisView[]; time: ISeriesPrimitiveAxisView[] } = { price: [], time: [] };
+  updateAllViews(): void {
+    this.axis = this.m.axisViews();
+  }
+  priceAxisViews(): readonly ISeriesPrimitiveAxisView[] {
+    return this.axis.price;
+  }
+  timeAxisViews(): readonly ISeriesPrimitiveAxisView[] {
+    return this.axis.time;
+  }
+  requestUpdate(): void {
+    this.request?.();
+  }
+  /** lightweight-charts sets the pane cursor from this (the manager's hover
+   *  state, updated on pointer move). */
+  hitTest(): PrimitiveHoveredItem | null {
+    const c = this.m.cursorAt();
+    // The chart re-reads the cursor only when the hovered item changes: the
+    // id carries the drawing and its cursor.
+    return c ? { cursorStyle: c, externalId: `lwcd:${this.m.hoveredId() ?? ""}:${c}`, zOrder: "top" } : null;
+  }
+  private draw(target: CanvasRenderingTarget2D): void {
+    target.useMediaCoordinateSpace(({ context: ctx, mediaSize }) => {
+      const w = mediaSize.width;
+      const h = mediaSize.height;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, 0, w, h);
+      ctx.clip();
+      const family = this.m.fontFamily();
+      const fillAt = (y: number) => this.m.backgroundAt(y, h);
+      const onAsyncLoad = () => this.requestUpdate();
+      for (const s of this.m.scenes(w, h)) {
+        drawScene(ctx, s.scene, { fontFamily: family, anchors: { fillAt, selected: s.selected, hovered: s.hoveredAnchor }, onAsyncLoad });
+      }
+      ctx.restore();
+    });
+  }
+}

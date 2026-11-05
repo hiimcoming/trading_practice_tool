@@ -1,0 +1,7360 @@
+{
+ "_说明": "由 generate_trading_cases.py 生成，不要手改；前后端交易规则逐项对账用",
+ "base_ms": 1767225600000,
+ "cases": [
+  {
+   "name": "E01_市价多单_盘中止损",
+   "note": "4200 买 0.1 手，止损 4190；第 2 根最低 4185 打到止损",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4202,
+     4195,
+     4196
+    ],
+    [
+     4196,
+     4197,
+     4185,
+     4186
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.1,
+     "sl": 4190
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 956.9999999999982,
+      "used_margin": 84.006,
+      "pending_margin": 0.0,
+      "free_margin": 872.9939999999982,
+      "real_leverage": 43.84535005224669,
+      "liquidation_price": 4100.3,
+      "status": "active"
+     },
+     {
+      "balance": 896.4999999999964,
+      "equity": 896.4999999999964,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 896.4999999999964,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 896.4999999999964,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4186,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "entry_price": 4200.3,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4189.95,
+       "close_reason": "stop",
+       "gross": -103.50000000000364,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 1.0,
+       "liquidation_adjust": 0.0,
+       "pnl": -103.50000000000364,
+       "sl_at_close": 4190,
+       "tp_at_close": null,
+       "initial_sl": 4190,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.1,
+         "price": 4189.95,
+         "reason": "stop"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "stop",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4189.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": -103.50000000000364
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E02_市价空单_盘中止盈",
+   "note": "4200 卖 0.1 手，止盈 4190（看买价）；最低 4189.75 时买价正好 4190",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4195,
+     4196
+    ],
+    [
+     4196,
+     4197,
+     4189.75,
+     4190
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": -1,
+     "qty": 0.1,
+     "tp": 4190
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 1036.9999999999982,
+      "used_margin": 83.999,
+      "pending_margin": 0.0,
+      "free_margin": 953.0009999999982,
+      "real_leverage": 40.46287367405986,
+      "liquidation_price": 4299.95,
+      "status": "active"
+     },
+     {
+      "balance": 1099.4999999999982,
+      "equity": 1099.4999999999982,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1099.4999999999982,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1099.4999999999982,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4190,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": -1,
+       "qty": 0.1,
+       "entry_price": 4199.95,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4190.0,
+       "close_reason": "tp",
+       "gross": 99.49999999999818,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "liquidation_adjust": 0.0,
+       "pnl": 99.49999999999818,
+       "sl_at_close": null,
+       "tp_at_close": 4190,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.1,
+         "price": 4190,
+         "reason": "tp"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": -1,
+       "qty": 0.1,
+       "price": 4199.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "tp",
+       "direction": -1,
+       "qty": 0.1,
+       "price": 4190,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.0,
+       "gross": 99.49999999999818
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E03_同根止损止盈都碰到按止损",
+   "note": "多单止损 4190、止盈 4210，第 2 根 4185–4215 两边都碰到",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4215,
+     4185,
+     4200
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.1,
+     "sl": 4190,
+     "tp": 4210
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 996.9999999999982,
+      "used_margin": 84.006,
+      "pending_margin": 0.0,
+      "free_margin": 912.9939999999982,
+      "real_leverage": 42.126379137412314,
+      "liquidation_price": 4100.3,
+      "status": "active"
+     },
+     {
+      "balance": 896.4999999999964,
+      "equity": 896.4999999999964,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 896.4999999999964,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 896.4999999999964,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4200,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "entry_price": 4200.3,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4189.95,
+       "close_reason": "stop",
+       "gross": -103.50000000000364,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 1.0,
+       "liquidation_adjust": 0.0,
+       "pnl": -103.50000000000364,
+       "sl_at_close": 4190,
+       "tp_at_close": 4210,
+       "initial_sl": 4190,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.1,
+         "price": 4189.95,
+         "reason": "stop"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "stop",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4189.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": -103.50000000000364
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E04_跳空止损",
+   "note": "多单止损 4190，第 2 根开盘 4185（跳空越过）按开盘价成交",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4185,
+     4186,
+     4180,
+     4182
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.1,
+     "sl": 4190,
+     "tp": 4230
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 996.9999999999982,
+      "used_margin": 84.006,
+      "pending_margin": 0.0,
+      "free_margin": 912.9939999999982,
+      "real_leverage": 42.126379137412314,
+      "liquidation_price": 4100.3,
+      "status": "active"
+     },
+     {
+      "balance": 846.4999999999964,
+      "equity": 846.4999999999964,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 846.4999999999964,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 846.4999999999964,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4182,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "entry_price": 4200.3,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4184.95,
+       "close_reason": "gap_stop",
+       "gross": -153.50000000000364,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 1.0,
+       "liquidation_adjust": 0.0,
+       "pnl": -153.50000000000364,
+       "sl_at_close": 4190,
+       "tp_at_close": 4230,
+       "initial_sl": 4190,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.1,
+         "price": 4184.95,
+         "reason": "gap_stop"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "gap_stop",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4184.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": -153.50000000000364
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E05_跳空止盈",
+   "note": "多单止盈 4210，第 2 根开盘 4215 按开盘价成交（更有利）",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4215,
+     4216,
+     4212,
+     4214
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.1,
+     "sl": 4180,
+     "tp": 4210
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 996.9999999999982,
+      "used_margin": 84.006,
+      "pending_margin": 0.0,
+      "free_margin": 912.9939999999982,
+      "real_leverage": 42.126379137412314,
+      "liquidation_price": 4100.3,
+      "status": "active"
+     },
+     {
+      "balance": 1146.9999999999982,
+      "equity": 1146.9999999999982,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1146.9999999999982,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1146.9999999999982,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4214,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "entry_price": 4200.3,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4215.0,
+       "close_reason": "gap_tp",
+       "gross": 146.99999999999818,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "liquidation_adjust": 0.0,
+       "pnl": 146.99999999999818,
+       "sl_at_close": 4180,
+       "tp_at_close": 4210,
+       "initial_sl": 4180,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.1,
+         "price": 4215,
+         "reason": "gap_tp"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "gap_tp",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4215,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "gross": 146.99999999999818
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E06_部分平仓与剩余不足最小手数",
+   "note": "买 0.05；平 0.02；再平 0.025（向下取整成 0.02，剩 0.01 正好）；最后平剩余。手动平仓立即按当前收盘价成交（D57）",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4202,
+     4203,
+     4201,
+     4202
+    ],
+    [
+     4205,
+     4206,
+     4204,
+     4205
+    ],
+    [
+     4203,
+     4204,
+     4202,
+     4203
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.05
+    },
+    {
+     "before_bar": 2,
+     "op": "close",
+     "position_index": 0,
+     "qty": 0.02
+    },
+    {
+     "before_bar": 3,
+     "op": "close",
+     "position_index": 0,
+     "qty": 0.025
+    },
+    {
+     "before_bar": 4,
+     "op": "close",
+     "position_index": 0
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1,
+     3,
+     4,
+     5
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 998.4999999999991,
+      "used_margin": 42.003,
+      "pending_margin": 0.0,
+      "free_margin": 956.496999999999,
+      "real_leverage": 21.031547320981492,
+      "liquidation_price": 4000.3,
+      "status": "active"
+     },
+     {
+      "balance": 999.2999999999993,
+      "equity": 1004.3999999999987,
+      "used_margin": 25.201800000000006,
+      "pending_margin": 0.0,
+      "free_margin": 979.1981999999987,
+      "real_leverage": 12.550776583034665,
+      "liquidation_price": 3867.2000000000007,
+      "status": "active"
+     },
+     {
+      "balance": 1002.5999999999985,
+      "equity": 1007.2999999999984,
+      "used_margin": 8.400600000000003,
+      "pending_margin": 0.0,
+      "free_margin": 998.8993999999983,
+      "real_leverage": 4.174525960488442,
+      "liquidation_price": 3197.7000000000016,
+      "status": "active"
+     },
+     {
+      "balance": 1007.2499999999982,
+      "equity": 1007.2499999999982,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1007.2499999999982,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1007.2499999999982,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4203,
+     "now_ms": 1767225900000,
+     "next_id": 6,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.05,
+       "entry_price": 4200.3,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225840000,
+       "exit_price_avg": 4201.75,
+       "close_reason": "manual",
+       "gross": 7.249999999998182,
+       "fees": 0.0,
+       "spread_cost": 1.25,
+       "slippage_cost": 0.5,
+       "liquidation_adjust": 0.0,
+       "pnl": 7.249999999998182,
+       "sl_at_close": null,
+       "tp_at_close": null,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.02,
+         "price": 4199.95,
+         "reason": "manual"
+        },
+        {
+         "ms": 1767225780000,
+         "qty": 0.02,
+         "price": 4201.95,
+         "reason": "manual"
+        },
+        {
+         "ms": 1767225840000,
+         "qty": 0.010000000000000002,
+         "price": 4204.95,
+         "reason": "manual"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.05,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 1.25,
+       "slippage_cost": 0.25,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": 3,
+       "action": "close",
+       "reason": "manual",
+       "direction": 1,
+       "qty": 0.02,
+       "price": 4199.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.1,
+       "gross": -0.7000000000007276
+      },
+      {
+       "seq": 3,
+       "ms": 1767225780000,
+       "position_id": 2,
+       "order_id": 4,
+       "action": "close",
+       "reason": "manual",
+       "direction": 1,
+       "qty": 0.02,
+       "price": 4201.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.1,
+       "gross": 3.2999999999992724
+      },
+      {
+       "seq": 4,
+       "ms": 1767225840000,
+       "position_id": 2,
+       "order_id": 5,
+       "action": "close",
+       "reason": "manual",
+       "direction": 1,
+       "qty": 0.010000000000000002,
+       "price": 4204.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.05000000000000002,
+       "gross": 4.649999999999637
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      },
+      {
+       "order_id": 3,
+       "kind": "close",
+       "result": "filled",
+       "ms": 1767225720000,
+       "position_id": 2
+      },
+      {
+       "order_id": 4,
+       "kind": "close",
+       "result": "filled",
+       "ms": 1767225780000,
+       "position_id": 2
+      },
+      {
+       "order_id": 5,
+       "kind": "close",
+       "result": "filled",
+       "ms": 1767225840000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E07_买入限价_触及即成交",
+   "note": "买入限价 4195（买价口径），第 1 根最低 4194.75 时买价正好 4195",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4194.75,
+     4198
+    ],
+    [
+     4198,
+     4199,
+     4197,
+     4198
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 4195,
+     "qty": 0.1
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 1030.0,
+      "used_margin": 83.9,
+      "pending_margin": 0.0,
+      "free_margin": 946.1,
+      "real_leverage": 40.75728155339806,
+      "liquidation_price": 4095.0,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 1030.0,
+      "used_margin": 83.9,
+      "pending_margin": 0.0,
+      "free_margin": 946.1,
+      "real_leverage": 40.75728155339806,
+      "liquidation_price": 4095.0,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1000.0,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4198,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [
+      {
+       "id": 2,
+       "order_id": 1,
+       "source": "buy_limit",
+       "direction": 1,
+       "qty": 0.1,
+       "initial_qty": 0.1,
+       "entry_price": 4195,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225660000,
+       "realized_gross": 0.0,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.0,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "buy_limit",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4195,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.0,
+       "gross": 0.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "buy_limit",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E08_买入限价_跳空按开盘价",
+   "note": "买入限价 4195，第 1 根开盘 4190（买价 4190.25）直接成交在开盘",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4190,
+     4192,
+     4188,
+     4191
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 4195,
+     "qty": 0.1
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 1007.5,
+      "used_margin": 83.805,
+      "pending_margin": 0.0,
+      "free_margin": 923.6949999999999,
+      "real_leverage": 41.59801488833747,
+      "liquidation_price": 4090.25,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1000.0,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4191,
+     "now_ms": 1767225720000,
+     "next_id": 3,
+     "positions": [
+      {
+       "id": 2,
+       "order_id": 1,
+       "source": "buy_limit",
+       "direction": 1,
+       "qty": 0.1,
+       "initial_qty": 0.1,
+       "entry_price": 4190.25,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225660000,
+       "realized_gross": 0.0,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.0,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "buy_limit",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4190.25,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.0,
+       "gross": 0.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "buy_limit",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E09_卖出限价_触及与跳空",
+   "note": "卖出限价 4205 第 1 根最高正好 4205 成交；另一张 4215 第 3 根开盘 4220 跳空成交",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4205,
+     4199,
+     4203
+    ],
+    [
+     4203,
+     4204,
+     4202,
+     4203
+    ],
+    [
+     4220,
+     4221,
+     4218,
+     4219
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": -1,
+     "price": 4205,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 2,
+     "op": "close",
+     "position_index": 0
+    },
+    {
+     "before_bar": 3,
+     "op": "pending",
+     "direction": -1,
+     "price": 4215,
+     "qty": 0.1
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1,
+     3,
+     4
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 1017.5,
+      "used_margin": 84.1,
+      "pending_margin": 0.0,
+      "free_margin": 933.4,
+      "real_leverage": 41.307125307125304,
+      "liquidation_price": 4305.0,
+      "status": "active"
+     },
+     {
+      "balance": 1016.9999999999982,
+      "equity": 1016.9999999999982,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1016.9999999999982,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1016.9999999999982,
+      "equity": 1024.4999999999982,
+      "used_margin": 84.4,
+      "pending_margin": 0.0,
+      "free_margin": 940.0999999999982,
+      "real_leverage": 41.181063933626234,
+      "liquidation_price": 4321.7,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1016.9999999999982,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4219,
+     "now_ms": 1767225840000,
+     "next_id": 6,
+     "positions": [
+      {
+       "id": 5,
+       "order_id": 4,
+       "source": "sell_limit",
+       "direction": -1,
+       "qty": 0.1,
+       "initial_qty": 0.1,
+       "entry_price": 4220.0,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225780000,
+       "realized_gross": 0.0,
+       "fees": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "sell_limit",
+       "direction": -1,
+       "qty": 0.1,
+       "entry_price": 4205,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4203.3,
+       "close_reason": "manual",
+       "gross": 16.99999999999818,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "liquidation_adjust": 0.0,
+       "pnl": 16.99999999999818,
+       "sl_at_close": null,
+       "tp_at_close": null,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.1,
+         "price": 4203.3,
+         "reason": "manual"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "sell_limit",
+       "direction": -1,
+       "qty": 0.1,
+       "price": 4205,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": 3,
+       "action": "close",
+       "reason": "manual",
+       "direction": -1,
+       "qty": 0.1,
+       "price": 4203.3,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 16.99999999999818
+      },
+      {
+       "seq": 3,
+       "ms": 1767225780000,
+       "position_id": 5,
+       "order_id": 4,
+       "action": "open",
+       "reason": "sell_limit",
+       "direction": -1,
+       "qty": 0.1,
+       "price": 4220.0,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "gross": 0.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "sell_limit",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      },
+      {
+       "order_id": 3,
+       "kind": "close",
+       "result": "filled",
+       "ms": 1767225720000,
+       "position_id": 2
+      },
+      {
+       "order_id": 4,
+       "kind": "sell_limit",
+       "result": "filled",
+       "ms": 1767225780000,
+       "position_id": 5
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E10_买入止损_触发加滑点与跳空",
+   "note": "买入止损 4205：第 1 根最高 4205 时买价 4205.25 触发，成交 4205.05；另一张 4230 第 3 根开盘 4240 跳空，按开盘买价 4240.25 + 滑点",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4205,
+     4199,
+     4204
+    ],
+    [
+     4204,
+     4206,
+     4203,
+     4205
+    ],
+    [
+     4240,
+     4241,
+     4239,
+     4240
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 4205,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 2,
+     "op": "close",
+     "position_index": 0
+    },
+    {
+     "before_bar": 3,
+     "op": "pending",
+     "direction": 1,
+     "price": 4230,
+     "qty": 0.1
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1,
+     3,
+     4
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 989.4999999999982,
+      "used_margin": 84.101,
+      "pending_margin": 0.0,
+      "free_margin": 905.3989999999982,
+      "real_leverage": 42.486104092976326,
+      "liquidation_price": 4105.05,
+      "status": "active"
+     },
+     {
+      "balance": 988.9999999999964,
+      "equity": 988.9999999999964,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 988.9999999999964,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 988.9999999999964,
+      "equity": 985.9999999999945,
+      "used_margin": 84.806,
+      "pending_margin": 0.0,
+      "free_margin": 901.1939999999945,
+      "real_leverage": 43.002028397566164,
+      "liquidation_price": 4141.4,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 988.9999999999964,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4240,
+     "now_ms": 1767225840000,
+     "next_id": 6,
+     "positions": [
+      {
+       "id": 5,
+       "order_id": 4,
+       "source": "buy_stop",
+       "direction": 1,
+       "qty": 0.1,
+       "initial_qty": 0.1,
+       "entry_price": 4240.3,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225780000,
+       "realized_gross": 0.0,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "buy_stop",
+       "direction": 1,
+       "qty": 0.1,
+       "entry_price": 4205.05,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4203.95,
+       "close_reason": "manual",
+       "gross": -11.000000000003638,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 1.0,
+       "liquidation_adjust": 0.0,
+       "pnl": -11.000000000003638,
+       "sl_at_close": null,
+       "tp_at_close": null,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.1,
+         "price": 4203.95,
+         "reason": "manual"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "buy_stop",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4205.05,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": 3,
+       "action": "close",
+       "reason": "manual",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4203.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": -11.000000000003638
+      },
+      {
+       "seq": 3,
+       "ms": 1767225780000,
+       "position_id": 5,
+       "order_id": 4,
+       "action": "open",
+       "reason": "buy_stop",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4240.3,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "buy_stop",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      },
+      {
+       "order_id": 3,
+       "kind": "close",
+       "result": "filled",
+       "ms": 1767225720000,
+       "position_id": 2
+      },
+      {
+       "order_id": 4,
+       "kind": "buy_stop",
+       "result": "filled",
+       "ms": 1767225780000,
+       "position_id": 5
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E11_卖出止损_触发与跳空",
+   "note": "卖出止损 4195 第 1 根最低 4194 触发，成交 4194.95；另一张 4180 第 3 根开盘 4170 跳空",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4194,
+     4196
+    ],
+    [
+     4196,
+     4197,
+     4195,
+     4196
+    ],
+    [
+     4170,
+     4171,
+     4168,
+     4170
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": -1,
+     "price": 4195,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 2,
+     "op": "close",
+     "position_index": 0
+    },
+    {
+     "before_bar": 3,
+     "op": "pending",
+     "direction": -1,
+     "price": 4180,
+     "qty": 0.1
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1,
+     3,
+     4
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 986.9999999999982,
+      "used_margin": 83.899,
+      "pending_margin": 0.0,
+      "free_margin": 903.1009999999982,
+      "real_leverage": 42.512664640324296,
+      "liquidation_price": 4294.95,
+      "status": "active"
+     },
+     {
+      "balance": 986.4999999999964,
+      "equity": 986.4999999999964,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 986.4999999999964,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 986.4999999999964,
+      "equity": 983.4999999999945,
+      "used_margin": 83.399,
+      "pending_margin": 0.0,
+      "free_margin": 900.1009999999945,
+      "real_leverage": 42.39959328927324,
+      "liquidation_price": 4268.6,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 986.4999999999964,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4170,
+     "now_ms": 1767225840000,
+     "next_id": 6,
+     "positions": [
+      {
+       "id": 5,
+       "order_id": 4,
+       "source": "sell_stop",
+       "direction": -1,
+       "qty": 0.1,
+       "initial_qty": 0.1,
+       "entry_price": 4169.95,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225780000,
+       "realized_gross": 0.0,
+       "fees": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "sell_stop",
+       "direction": -1,
+       "qty": 0.1,
+       "entry_price": 4194.95,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4196.3,
+       "close_reason": "manual",
+       "gross": -13.500000000003638,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 1.0,
+       "liquidation_adjust": 0.0,
+       "pnl": -13.500000000003638,
+       "sl_at_close": null,
+       "tp_at_close": null,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.1,
+         "price": 4196.3,
+         "reason": "manual"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "sell_stop",
+       "direction": -1,
+       "qty": 0.1,
+       "price": 4194.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": 3,
+       "action": "close",
+       "reason": "manual",
+       "direction": -1,
+       "qty": 0.1,
+       "price": 4196.3,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": -13.500000000003638
+      },
+      {
+       "seq": 3,
+       "ms": 1767225780000,
+       "position_id": 5,
+       "order_id": 4,
+       "action": "open",
+       "reason": "sell_stop",
+       "direction": -1,
+       "qty": 0.1,
+       "price": 4169.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "sell_stop",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      },
+      {
+       "order_id": 3,
+       "kind": "close",
+       "result": "filled",
+       "ms": 1767225720000,
+       "position_id": 2
+      },
+      {
+       "order_id": 4,
+       "kind": "sell_stop",
+       "result": "filled",
+       "ms": 1767225780000,
+       "position_id": 5
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E12_成交根内碰到止损",
+   "note": "买入限价 4195 带止损 4190、止盈 4198；第 1 根 4189–4199：成交后同根止损（止盈本根不算）",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4200,
+     4189,
+     4192
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 4195,
+     "qty": 0.1,
+     "sl": 4190,
+     "tp": 4198
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 949.4999999999982,
+      "equity": 949.4999999999982,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 949.4999999999982,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 949.4999999999982,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4192,
+     "now_ms": 1767225720000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "buy_limit",
+       "direction": 1,
+       "qty": 0.1,
+       "entry_price": 4195,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225660000,
+       "exit_price_avg": 4189.95,
+       "close_reason": "stop",
+       "gross": -50.50000000000182,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "liquidation_adjust": 0.0,
+       "pnl": -50.50000000000182,
+       "sl_at_close": 4190,
+       "tp_at_close": 4198,
+       "initial_sl": 4190,
+       "exits": [
+        {
+         "ms": 1767225660000,
+         "qty": 0.1,
+         "price": 4189.95,
+         "reason": "stop"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "buy_limit",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4195,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.0,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "stop",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4189.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": -50.50000000000182
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "buy_limit",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E13_成交根内止盈下一根才算",
+   "note": "买入限价 4195 带止盈 4198；第 1 根 4194–4199 成交但止盈不算；第 2 根才止盈",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4200,
+     4194,
+     4197
+    ],
+    [
+     4197,
+     4199,
+     4196,
+     4198
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 4195,
+     "qty": 0.1,
+     "tp": 4198
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 1020.0,
+      "used_margin": 83.9,
+      "pending_margin": 0.0,
+      "free_margin": 936.1,
+      "real_leverage": 41.14705882352941,
+      "liquidation_price": 4095.0,
+      "status": "active"
+     },
+     {
+      "balance": 1030.0,
+      "equity": 1030.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1030.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1030.0,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4198,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "buy_limit",
+       "direction": 1,
+       "qty": 0.1,
+       "entry_price": 4195,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4198.0,
+       "close_reason": "tp",
+       "gross": 30.0,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.0,
+       "liquidation_adjust": 0.0,
+       "pnl": 30.0,
+       "sl_at_close": null,
+       "tp_at_close": 4198,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.1,
+         "price": 4198,
+         "reason": "tp"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "buy_limit",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4195,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.0,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "tp",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4198,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "gross": 30.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "buy_limit",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E14_同根多张挂单按距离成交_保证金不足",
+   "note": "账户 200 美元：买入限价 4195 和 4190 各 0.1 手（各预占约 84，挂得上），同一根都触发：先成交近的 4195，之后浮亏使可用保证金不够，4190 成交时保证金不足未成交",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 200.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4200,
+     4187,
+     4192
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 4190,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 4195,
+     "qty": 0.1
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1,
+     2
+    ],
+    "per_bar": [
+     {
+      "balance": 200.0,
+      "equity": 200.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 200.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 200.0,
+      "equity": 170.0,
+      "used_margin": 83.9,
+      "pending_margin": 0.0,
+      "free_margin": 86.1,
+      "real_leverage": 246.58823529411765,
+      "liquidation_price": 4175.0,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 200.0,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4192,
+     "now_ms": 1767225720000,
+     "next_id": 4,
+     "positions": [
+      {
+       "id": 3,
+       "order_id": 2,
+       "source": "buy_limit",
+       "direction": 1,
+       "qty": 0.1,
+       "initial_qty": 0.1,
+       "entry_price": 4195,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225660000,
+       "realized_gross": 0.0,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.0,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 3,
+       "order_id": 2,
+       "action": "open",
+       "reason": "buy_limit",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4195,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.0,
+       "gross": 0.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 2,
+       "kind": "buy_limit",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 3
+      },
+      {
+       "order_id": 1,
+       "kind": "buy_limit",
+       "result": "margin_insufficient",
+       "ms": 1767225660000,
+       "position_id": null
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E15_反向挂单自动撤销_OCO",
+   "note": "上方买入止损 4210、下方卖出止损 4190；买单成交后卖单自动撤销",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4212,
+     4199,
+     4211
+    ],
+    [
+     4211,
+     4212,
+     4185,
+     4186
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 4210,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": -1,
+     "price": 4190,
+     "qty": 0.1
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1,
+     2
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 1009.4999999999982,
+      "used_margin": 84.201,
+      "pending_margin": 0.0,
+      "free_margin": 925.2989999999982,
+      "real_leverage": 41.713719663199676,
+      "liquidation_price": 4110.05,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 759.4999999999982,
+      "used_margin": 84.201,
+      "pending_margin": 0.0,
+      "free_margin": 675.2989999999982,
+      "real_leverage": 55.11520737327202,
+      "liquidation_price": 4110.05,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1000.0,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4186,
+     "now_ms": 1767225780000,
+     "next_id": 4,
+     "positions": [
+      {
+       "id": 3,
+       "order_id": 1,
+       "source": "buy_stop",
+       "direction": 1,
+       "qty": 0.1,
+       "initial_qty": 0.1,
+       "entry_price": 4210.05,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225660000,
+       "realized_gross": 0.0,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 3,
+       "order_id": 1,
+       "action": "open",
+       "reason": "buy_stop",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4210.05,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "buy_stop",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 3
+      },
+      {
+       "order_id": 2,
+       "kind": "sell_stop",
+       "result": "cancelled_opposite",
+       "ms": 1767225660000,
+       "position_id": null
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E16_持多单时反向下单被拒",
+   "note": "持有多单：市价卖出被拒；持仓后挂的卖出限价触发时因持有反向仓位而撤销",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4206,
+     4199,
+     4204
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 2,
+     "op": "pending",
+     "direction": -1,
+     "price": 4205,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 2,
+     "op": "market",
+     "direction": -1,
+     "qty": 0.1
+    }
+   ],
+   "expected": {
+    "errors": [
+     {
+      "before_bar": 2,
+      "op": "market",
+      "code": "opposite_position"
+     }
+    ],
+    "returned": [
+     1,
+     3
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 996.9999999999982,
+      "used_margin": 84.006,
+      "pending_margin": 0.0,
+      "free_margin": 912.9939999999982,
+      "real_leverage": 42.126379137412314,
+      "liquidation_price": 4100.3,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 1036.9999999999982,
+      "used_margin": 84.006,
+      "pending_margin": 0.0,
+      "free_margin": 952.9939999999982,
+      "real_leverage": 40.54001928640316,
+      "liquidation_price": 4100.3,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1000.0,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4204,
+     "now_ms": 1767225780000,
+     "next_id": 4,
+     "positions": [
+      {
+       "id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "initial_qty": 0.1,
+       "entry_price": 4200.3,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225660000,
+       "realized_gross": 0.0,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      },
+      {
+       "order_id": 3,
+       "kind": "sell_limit",
+       "result": "opposite_position",
+       "ms": 1767225720000,
+       "position_id": null
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E16b_待成交买单时市价卖出被拒",
+   "note": "同一根前先排队市价买入、再市价卖出：卖单当场被拒（D76，不等成交）",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": -1,
+     "qty": 0.1
+    }
+   ],
+   "expected": {
+    "errors": [
+     {
+      "before_bar": 1,
+      "op": "market",
+      "code": "opposite_position"
+     }
+    ],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 996.9999999999982,
+      "used_margin": 84.006,
+      "pending_margin": 0.0,
+      "free_margin": 912.9939999999982,
+      "real_leverage": 42.126379137412314,
+      "liquidation_price": 4100.3,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1000.0,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4200,
+     "now_ms": 1767225720000,
+     "next_id": 3,
+     "positions": [
+      {
+       "id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "initial_qty": 0.1,
+       "entry_price": 4200.3,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225660000,
+       "realized_gross": 0.0,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E16c_同一根连下两笔市价买单",
+   "note": "两笔在同一根开盘同价成交，成为两个独立仓位；第一笔带止盈 4203，下一根碰到后只平这一笔",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4202,
+     4199,
+     4201
+    ],
+    [
+     4201,
+     4205,
+     4200,
+     4204
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.1,
+     "tp": 4203
+    },
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.2
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1,
+     2
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 1020.9999999999945,
+      "used_margin": 252.018,
+      "pending_margin": 0.0,
+      "free_margin": 768.9819999999945,
+      "real_leverage": 123.43780607247862,
+      "liquidation_price": 4166.966666666666,
+      "status": "active"
+     },
+     {
+      "balance": 1026.9999999999982,
+      "equity": 1100.9999999999945,
+      "used_margin": 168.012,
+      "pending_margin": 0.0,
+      "free_margin": 932.9879999999946,
+      "real_leverage": 76.36693914623108,
+      "liquidation_price": 4148.95,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1026.9999999999982,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4204,
+     "now_ms": 1767225780000,
+     "next_id": 5,
+     "positions": [
+      {
+       "id": 4,
+       "order_id": 2,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.2,
+       "initial_qty": 0.2,
+       "entry_price": 4200.3,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225660000,
+       "realized_gross": 0.0,
+       "fees": 0.0,
+       "spread_cost": 5.0,
+       "slippage_cost": 1.0,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 3,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "entry_price": 4200.3,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4203.0,
+       "close_reason": "tp",
+       "gross": 26.99999999999818,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "liquidation_adjust": 0.0,
+       "pnl": 26.99999999999818,
+       "sl_at_close": null,
+       "tp_at_close": 4203,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.1,
+         "price": 4203,
+         "reason": "tp"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 3,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225660000,
+       "position_id": 4,
+       "order_id": 2,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.2,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 5.0,
+       "slippage_cost": 1.0,
+       "gross": 0.0
+      },
+      {
+       "seq": 3,
+       "ms": 1767225720000,
+       "position_id": 3,
+       "order_id": null,
+       "action": "close",
+       "reason": "tp",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4203,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "gross": 26.99999999999818
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 3
+      },
+      {
+       "order_id": 2,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 4
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E17_盘中强平_资金账户为0本轮结束",
+   "note": "1000 美元在 4200 买 1 手（保证金 840），强平价约 4190.3；第 2 根跌到 4180",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4180,
+     4185
+    ],
+    [
+     4185,
+     4186,
+     4184,
+     4185
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 1.0
+    },
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 4150,
+     "qty": 0.01
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1,
+     2
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 969.9999999999818,
+      "used_margin": 840.06,
+      "pending_margin": 8.3,
+      "free_margin": 121.63999999998187,
+      "real_leverage": 432.9896907216576,
+      "liquidation_price": 4190.3,
+      "status": "active"
+     },
+     {
+      "balance": 0.0,
+      "equity": 0.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 0.0,
+      "real_leverage": null,
+      "liquidation_price": null,
+      "status": "ended_liquidation"
+     },
+     {
+      "skipped": true,
+      "status": "ended_liquidation"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 0.0,
+     "funding": 0.0,
+     "status": "ended_liquidation",
+     "last_bid": 4185,
+     "now_ms": 1767225780000,
+     "next_id": 4,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 3,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 1.0,
+       "entry_price": 4200.3,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4190.25,
+       "close_reason": "liquidation",
+       "gross": -1005.0000000000182,
+       "fees": 0.0,
+       "spread_cost": 25.0,
+       "slippage_cost": 10.0,
+       "liquidation_adjust": 5.00000000001819,
+       "pnl": -1000.0,
+       "sl_at_close": null,
+       "tp_at_close": null,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 1.0,
+         "price": 4190.25,
+         "reason": "liquidation"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 3,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 1.0,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 25.0,
+       "slippage_cost": 5.0,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 3,
+       "order_id": null,
+       "action": "close",
+       "reason": "liquidation",
+       "direction": 1,
+       "qty": 1.0,
+       "price": 4190.25,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 5.0,
+       "gross": -1005.0000000000182
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 3
+      },
+      {
+       "order_id": 2,
+       "kind": "buy_limit",
+       "result": "cancelled_liquidation",
+       "ms": 1767225720000,
+       "position_id": null
+      }
+     ],
+     "transfers": [],
+     "liquidations": [
+      {
+       "ms": 1767225720000,
+       "liquidation_price": 4190.3,
+       "fill_level": 4190.3,
+       "at_open": false,
+       "balance_before": 1000.0,
+       "residual_cleared": -5.00000000001819,
+       "status_after": "ended_liquidation"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "name": "E18_强平后暂停_转入后继续",
+   "note": "资金账户 500：强平后暂停（第 3 根跳过），转入 300 后继续交易并盈利",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 500.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4180,
+     4185
+    ],
+    [
+     4185,
+     4186,
+     4184,
+     4185
+    ],
+    [
+     4185,
+     4186,
+     4184,
+     4185
+    ],
+    [
+     4185,
+     4195,
+     4184,
+     4194
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 1.0
+    },
+    {
+     "before_bar": 4,
+     "op": "transfer",
+     "direction": "to_trading",
+     "amount": 300.0
+    },
+    {
+     "before_bar": 4,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.1,
+     "tp": 4190
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1,
+     null,
+     3
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 969.9999999999818,
+      "used_margin": 840.06,
+      "pending_margin": 0.0,
+      "free_margin": 129.93999999998186,
+      "real_leverage": 432.9896907216576,
+      "liquidation_price": 4190.3,
+      "status": "active"
+     },
+     {
+      "balance": 0.0,
+      "equity": 0.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 0.0,
+      "real_leverage": null,
+      "liquidation_price": null,
+      "status": "liquidated_paused"
+     },
+     {
+      "skipped": true,
+      "status": "liquidated_paused"
+     },
+     {
+      "balance": 300.0,
+      "equity": 296.9999999999982,
+      "used_margin": 83.706,
+      "pending_margin": 0.0,
+      "free_margin": 213.29399999999816,
+      "real_leverage": 140.90909090909176,
+      "liquidation_price": 4155.3,
+      "status": "active"
+     },
+     {
+      "balance": 346.9999999999982,
+      "equity": 346.9999999999982,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 346.9999999999982,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 346.9999999999982,
+     "funding": 200.0,
+     "status": "active",
+     "last_bid": 4194,
+     "now_ms": 1767225960000,
+     "next_id": 5,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 1.0,
+       "entry_price": 4200.3,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4190.25,
+       "close_reason": "liquidation",
+       "gross": -1005.0000000000182,
+       "fees": 0.0,
+       "spread_cost": 25.0,
+       "slippage_cost": 10.0,
+       "liquidation_adjust": 5.00000000001819,
+       "pnl": -1000.0,
+       "sl_at_close": null,
+       "tp_at_close": null,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 1.0,
+         "price": 4190.25,
+         "reason": "liquidation"
+        }
+       ]
+      },
+      {
+       "position_id": 4,
+       "order_id": 3,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "entry_price": 4185.3,
+       "open_ms": 1767225840000,
+       "close_ms": 1767225900000,
+       "exit_price_avg": 4190.0,
+       "close_reason": "tp",
+       "gross": 46.99999999999818,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "liquidation_adjust": 0.0,
+       "pnl": 46.99999999999818,
+       "sl_at_close": null,
+       "tp_at_close": 4190,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225900000,
+         "qty": 0.1,
+         "price": 4190,
+         "reason": "tp"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 1.0,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 25.0,
+       "slippage_cost": 5.0,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "liquidation",
+       "direction": 1,
+       "qty": 1.0,
+       "price": 4190.25,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 5.0,
+       "gross": -1005.0000000000182
+      },
+      {
+       "seq": 3,
+       "ms": 1767225840000,
+       "position_id": 4,
+       "order_id": 3,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4185.3,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 4,
+       "ms": 1767225900000,
+       "position_id": 4,
+       "order_id": null,
+       "action": "close",
+       "reason": "tp",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4190,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "gross": 46.99999999999818
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      },
+      {
+       "order_id": 3,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225840000,
+       "position_id": 4
+      }
+     ],
+     "transfers": [
+      {
+       "ms": 1767225780000,
+       "direction": "to_trading",
+       "amount": 300.0,
+       "equity_before": 0.0,
+       "had_positions": false
+      }
+     ],
+     "liquidations": [
+      {
+       "ms": 1767225720000,
+       "liquidation_price": 4190.3,
+       "fill_level": 4190.3,
+       "at_open": false,
+       "balance_before": 1000.0,
+       "residual_cleared": -5.00000000001819,
+       "status_after": "liquidated_paused"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "name": "E19_跳空强平_负余额保护",
+   "note": "持 1 手多单，周末式跳空开在 4150（远低于强平价），按开盘价强平，余额不为负",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4150,
+     4152,
+     4148,
+     4150
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 1.0
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 969.9999999999818,
+      "used_margin": 840.06,
+      "pending_margin": 0.0,
+      "free_margin": 129.93999999998186,
+      "real_leverage": 432.9896907216576,
+      "liquidation_price": 4190.3,
+      "status": "active"
+     },
+     {
+      "balance": 0.0,
+      "equity": 0.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 0.0,
+      "real_leverage": null,
+      "liquidation_price": null,
+      "status": "ended_liquidation"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 0.0,
+     "funding": 0.0,
+     "status": "ended_liquidation",
+     "last_bid": 4150,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 1.0,
+       "entry_price": 4200.3,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4149.95,
+       "close_reason": "liquidation",
+       "gross": -5035.000000000036,
+       "fees": 0.0,
+       "spread_cost": 25.0,
+       "slippage_cost": 10.0,
+       "liquidation_adjust": 4035.000000000036,
+       "pnl": -1000.0000000000005,
+       "sl_at_close": null,
+       "tp_at_close": null,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 1.0,
+         "price": 4149.95,
+         "reason": "liquidation"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 1.0,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 25.0,
+       "slippage_cost": 5.0,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "liquidation",
+       "direction": 1,
+       "qty": 1.0,
+       "price": 4149.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 5.0,
+       "gross": -5035.000000000036
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": [
+      {
+       "ms": 1767225720000,
+       "liquidation_price": 4190.3,
+       "fill_level": 4150,
+       "at_open": true,
+       "balance_before": 1000.0,
+       "residual_cleared": -4035.0000000000364,
+       "status_after": "ended_liquidation"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "name": "E20_止损比强平近_先止损不强平",
+   "note": "1 手多单止损 4195（强平价约 4190.3），第 2 根跌到 4185：先止损，之后无仓位不强平",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4185,
+     4190
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 1.0,
+     "sl": 4195
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 969.9999999999818,
+      "used_margin": 840.06,
+      "pending_margin": 0.0,
+      "free_margin": 129.93999999998186,
+      "real_leverage": 432.9896907216576,
+      "liquidation_price": 4190.3,
+      "status": "active"
+     },
+     {
+      "balance": 464.9999999999636,
+      "equity": 464.9999999999636,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 464.9999999999636,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 464.9999999999636,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4190,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 1.0,
+       "entry_price": 4200.3,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4194.95,
+       "close_reason": "stop",
+       "gross": -535.0000000000364,
+       "fees": 0.0,
+       "spread_cost": 25.0,
+       "slippage_cost": 10.0,
+       "liquidation_adjust": 0.0,
+       "pnl": -535.0000000000364,
+       "sl_at_close": 4195,
+       "tp_at_close": null,
+       "initial_sl": 4195,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 1.0,
+         "price": 4194.95,
+         "reason": "stop"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 1.0,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 25.0,
+       "slippage_cost": 5.0,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "stop",
+       "direction": 1,
+       "qty": 1.0,
+       "price": 4194.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 5.0,
+       "gross": -535.0000000000364
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E21_强平与止盈同根按强平",
+   "note": "1 手多单止盈 4205，第 2 根 4180–4206 两边都碰到：按强平",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4206,
+     4180,
+     4190
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 1.0,
+     "tp": 4205
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 969.9999999999818,
+      "used_margin": 840.06,
+      "pending_margin": 0.0,
+      "free_margin": 129.93999999998186,
+      "real_leverage": 432.9896907216576,
+      "liquidation_price": 4190.3,
+      "status": "active"
+     },
+     {
+      "balance": 0.0,
+      "equity": 0.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 0.0,
+      "real_leverage": null,
+      "liquidation_price": null,
+      "status": "ended_liquidation"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 0.0,
+     "funding": 0.0,
+     "status": "ended_liquidation",
+     "last_bid": 4190,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 1.0,
+       "entry_price": 4200.3,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4190.25,
+       "close_reason": "liquidation",
+       "gross": -1005.0000000000182,
+       "fees": 0.0,
+       "spread_cost": 25.0,
+       "slippage_cost": 10.0,
+       "liquidation_adjust": 5.00000000001819,
+       "pnl": -1000.0,
+       "sl_at_close": null,
+       "tp_at_close": 4205,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 1.0,
+         "price": 4190.25,
+         "reason": "liquidation"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 1.0,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 25.0,
+       "slippage_cost": 5.0,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "liquidation",
+       "direction": 1,
+       "qty": 1.0,
+       "price": 4190.25,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 5.0,
+       "gross": -1005.0000000000182
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": [
+      {
+       "ms": 1767225720000,
+       "liquidation_price": 4190.3,
+       "fill_level": 4190.3,
+       "at_open": false,
+       "balance_before": 1000.0,
+       "residual_cleared": -5.00000000001819,
+       "status_after": "ended_liquidation"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "name": "E22_出入金规则",
+   "note": "资金账户 200：转入 100（余额 1100）；多单浮盈 97 时出金 1105 被拒（超过余额，浮盈不能提）；出金 50；资金不足转入被拒；负数被拒",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 200.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4210,
+     4211,
+     4209,
+     4210
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "transfer",
+     "direction": "to_trading",
+     "amount": 100.0
+    },
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 3,
+     "op": "transfer",
+     "direction": "to_funding",
+     "amount": 1105.0
+    },
+    {
+     "before_bar": 3,
+     "op": "transfer",
+     "direction": "to_funding",
+     "amount": 50.0
+    },
+    {
+     "before_bar": 3,
+     "op": "transfer",
+     "direction": "to_trading",
+     "amount": 500.0
+    },
+    {
+     "before_bar": 3,
+     "op": "transfer",
+     "direction": "to_funding",
+     "amount": -5.0
+    }
+   ],
+   "expected": {
+    "errors": [
+     {
+      "before_bar": 3,
+      "op": "transfer",
+      "code": "over_withdraw"
+     },
+     {
+      "before_bar": 3,
+      "op": "transfer",
+      "code": "over_funding"
+     },
+     {
+      "before_bar": 3,
+      "op": "transfer",
+      "code": "bad_amount"
+     }
+    ],
+    "returned": [
+     null,
+     1,
+     null
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1100.0,
+      "equity": 1096.9999999999982,
+      "used_margin": 84.006,
+      "pending_margin": 0.0,
+      "free_margin": 1012.9939999999982,
+      "real_leverage": 38.286235186873355,
+      "liquidation_price": 4090.3,
+      "status": "active"
+     },
+     {
+      "balance": 1100.0,
+      "equity": 1196.9999999999982,
+      "used_margin": 84.006,
+      "pending_margin": 0.0,
+      "free_margin": 1112.993999999998,
+      "real_leverage": 35.17126148705101,
+      "liquidation_price": 4090.3,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1050.0,
+     "funding": 150.0,
+     "status": "active",
+     "last_bid": 4210,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [
+      {
+       "id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "initial_qty": 0.1,
+       "entry_price": 4200.3,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225660000,
+       "realized_gross": 0.0,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [
+      {
+       "ms": 1767225660000,
+       "direction": "to_trading",
+       "amount": 100.0,
+       "equity_before": 1000.0,
+       "had_positions": false
+      },
+      {
+       "ms": 1767225780000,
+       "direction": "to_funding",
+       "amount": 50.0,
+       "equity_before": 1196.9999999999982,
+       "had_positions": true
+      }
+     ],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E23_改挂单越过现价自动切换类型_撤单",
+   "note": "买入限价 4195 改到 4210 → 自动变成买入止损；再撤单；另挂一张价位等于买价被拒",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 4195,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 1,
+     "op": "modify_pending",
+     "order_index": 0,
+     "price": 4210,
+     "qty": 0.2,
+     "sl": 4200
+    },
+    {
+     "before_bar": 1,
+     "op": "cancel_pending",
+     "order_index": 0
+    },
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 4200.25,
+     "qty": 0.1
+    }
+   ],
+   "expected": {
+    "errors": [
+     {
+      "before_bar": 1,
+      "op": "pending",
+      "code": "price_equals_market"
+     }
+    ],
+    "returned": [
+     1,
+     null,
+     null
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1000.0,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4200,
+     "now_ms": 1767225720000,
+     "next_id": 2,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [],
+     "fills": [],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "buy_stop",
+       "result": "cancelled",
+       "ms": 1767225660000,
+       "position_id": null
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E24_改止损止盈_保本_错误一侧被拒",
+   "note": "多单开在 4200.30：现价 4200 时止损设 4205 被拒；涨到 4203 后止损移到开仓价（保本），第 3 根跌到 4199 被打到",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4203,
+     4204,
+     4202,
+     4203
+    ],
+    [
+     4203,
+     4204,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 2,
+     "op": "set_stops",
+     "position_index": 0,
+     "sl": 4205.0
+    },
+    {
+     "before_bar": 3,
+     "op": "set_stops",
+     "position_index": 0,
+     "sl": 4200.3,
+     "tp": null
+    }
+   ],
+   "expected": {
+    "errors": [
+     {
+      "before_bar": 2,
+      "op": "set_stops",
+      "code": "stop_wrong_side"
+     }
+    ],
+    "returned": [
+     1,
+     null
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 996.9999999999982,
+      "used_margin": 84.006,
+      "pending_margin": 0.0,
+      "free_margin": 912.9939999999982,
+      "real_leverage": 42.126379137412314,
+      "liquidation_price": 4100.3,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 1026.9999999999982,
+      "used_margin": 84.006,
+      "pending_margin": 0.0,
+      "free_margin": 942.9939999999982,
+      "real_leverage": 40.925024342745935,
+      "liquidation_price": 4100.3,
+      "status": "active"
+     },
+     {
+      "balance": 999.4999999999982,
+      "equity": 999.4999999999982,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 999.4999999999982,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 999.4999999999982,
+      "equity": 999.4999999999982,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 999.4999999999982,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 999.4999999999982,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4200,
+     "now_ms": 1767225900000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "entry_price": 4200.3,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225780000,
+       "exit_price_avg": 4200.25,
+       "close_reason": "stop",
+       "gross": -0.500000000001819,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 1.0,
+       "liquidation_adjust": 0.0,
+       "pnl": -0.500000000001819,
+       "sl_at_close": 4200.3,
+       "tp_at_close": null,
+       "initial_sl": 4200.3,
+       "exits": [
+        {
+         "ms": 1767225780000,
+         "qty": 0.1,
+         "price": 4200.25,
+         "reason": "stop"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225780000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "stop",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4200.25,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": -0.500000000001819
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E25_结束本轮按现价全平并撤挂单",
+   "note": "持多单和一张挂单，结束本轮：按最后收盘 4206 全平，挂单撤销",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4207,
+     4199,
+     4206
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 2,
+     "op": "pending",
+     "direction": 1,
+     "price": 4190,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 3,
+     "op": "close_all"
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1,
+     3,
+     null
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 996.9999999999982,
+      "used_margin": 84.006,
+      "pending_margin": 0.0,
+      "free_margin": 912.9939999999982,
+      "real_leverage": 42.126379137412314,
+      "liquidation_price": 4100.3,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 1056.9999999999982,
+      "used_margin": 84.006,
+      "pending_margin": 83.8,
+      "free_margin": 889.1939999999983,
+      "real_leverage": 39.79186376537377,
+      "liquidation_price": 4100.3,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1056.4999999999964,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4206,
+     "now_ms": 1767225780000,
+     "next_id": 4,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "entry_price": 4200.3,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225780000,
+       "exit_price_avg": 4205.95,
+       "close_reason": "end_of_round",
+       "gross": 56.49999999999636,
+       "fees": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 1.0,
+       "liquidation_adjust": 0.0,
+       "pnl": 56.49999999999636,
+       "sl_at_close": null,
+       "tp_at_close": null,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225780000,
+         "qty": 0.1,
+         "price": 4205.95,
+         "reason": "end_of_round"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4200.3,
+       "fee": 0.0,
+       "spread_cost": 2.5,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225780000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "end_of_round",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 4205.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": 56.49999999999636
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      },
+      {
+       "order_id": 3,
+       "kind": "buy_limit",
+       "result": "cancelled_end_of_round",
+       "ms": 1767225780000,
+       "position_id": null
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E26_空单强平看买价",
+   "note": "空单 1 手开在 4199.95，强平价（买价口径）4209.95；最高 4209.80 时买价 4210.05 越过强平价",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4209.8,
+     4199,
+     4205
+    ],
+    [
+     4205,
+     4206,
+     4204,
+     4205
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": -1,
+     "qty": 1.0
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 969.9999999999818,
+      "used_margin": 839.99,
+      "pending_margin": 0.0,
+      "free_margin": 130.0099999999818,
+      "real_leverage": 432.9896907216576,
+      "liquidation_price": 4209.95,
+      "status": "active"
+     },
+     {
+      "balance": 0.0,
+      "equity": 0.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 0.0,
+      "real_leverage": null,
+      "liquidation_price": null,
+      "status": "ended_liquidation"
+     },
+     {
+      "skipped": true,
+      "status": "ended_liquidation"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 0.0,
+     "funding": 0.0,
+     "status": "ended_liquidation",
+     "last_bid": 4205,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": -1,
+       "qty": 1.0,
+       "entry_price": 4199.95,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 4210.0,
+       "close_reason": "liquidation",
+       "gross": -1005.0000000000182,
+       "fees": 0.0,
+       "spread_cost": 25.0,
+       "slippage_cost": 10.0,
+       "liquidation_adjust": 5.00000000001819,
+       "pnl": -1000.0,
+       "sl_at_close": null,
+       "tp_at_close": null,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 1.0,
+         "price": 4210.0,
+         "reason": "liquidation"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": -1,
+       "qty": 1.0,
+       "price": 4199.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 5.0,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "liquidation",
+       "direction": -1,
+       "qty": 1.0,
+       "price": 4210.0,
+       "fee": 0.0,
+       "spread_cost": 25.0,
+       "slippage_cost": 5.0,
+       "gross": -1005.0000000000182
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": [
+      {
+       "ms": 1767225720000,
+       "liquidation_price": 4209.95,
+       "fill_level": 4209.95,
+       "at_open": false,
+       "balance_before": 1000.0,
+       "residual_cleared": -5.00000000001819,
+       "status_after": "ended_liquidation"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "name": "E27_加仓合并强平价_止损跳空空单",
+   "note": "空单两笔（0.3 + 0.2 手）合并强平价；第二笔止损 4210（看买价），第 3 根开盘 4212 跳空止损",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4198,
+     4199,
+     4197,
+     4198
+    ],
+    [
+     4212,
+     4213,
+     4211,
+     4212
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": -1,
+     "qty": 0.3
+    },
+    {
+     "before_bar": 2,
+     "op": "market",
+     "direction": -1,
+     "qty": 0.2,
+     "sl": 4210
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1,
+     3
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 990.9999999999945,
+      "used_margin": 251.997,
+      "pending_margin": 0.0,
+      "free_margin": 739.0029999999945,
+      "real_leverage": 127.14429868819444,
+      "liquidation_price": 4233.283333333334,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 1044.999999999991,
+      "used_margin": 419.915,
+      "pending_margin": 0.0,
+      "free_margin": 625.0849999999909,
+      "real_leverage": 200.8612440191405,
+      "liquidation_price": 4219.15,
+      "status": "active"
+     },
+     {
+      "balance": 712.9999999999927,
+      "equity": 343.99999999998727,
+      "used_margin": 251.997,
+      "pending_margin": 0.0,
+      "free_margin": 92.00299999998725,
+      "real_leverage": 367.3255813953624,
+      "liquidation_price": 4223.716666666666,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 712.9999999999927,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4212,
+     "now_ms": 1767225840000,
+     "next_id": 5,
+     "positions": [
+      {
+       "id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": -1,
+       "qty": 0.3,
+       "initial_qty": 0.3,
+       "entry_price": 4199.95,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225660000,
+       "realized_gross": 0.0,
+       "fees": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 1.5,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 4,
+       "order_id": 3,
+       "source": "market",
+       "direction": -1,
+       "qty": 0.2,
+       "entry_price": 4197.95,
+       "open_ms": 1767225720000,
+       "close_ms": 1767225780000,
+       "exit_price_avg": 4212.3,
+       "close_reason": "gap_stop",
+       "gross": -287.0000000000073,
+       "fees": 0.0,
+       "spread_cost": 5.0,
+       "slippage_cost": 2.0,
+       "liquidation_adjust": 0.0,
+       "pnl": -287.0000000000073,
+       "sl_at_close": 4210,
+       "tp_at_close": null,
+       "initial_sl": 4210,
+       "exits": [
+        {
+         "ms": 1767225780000,
+         "qty": 0.2,
+         "price": 4212.3,
+         "reason": "gap_stop"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": -1,
+       "qty": 0.3,
+       "price": 4199.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 1.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 4,
+       "order_id": 3,
+       "action": "open",
+       "reason": "market",
+       "direction": -1,
+       "qty": 0.2,
+       "price": 4197.95,
+       "fee": 0.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 1.0,
+       "gross": 0.0
+      },
+      {
+       "seq": 3,
+       "ms": 1767225780000,
+       "position_id": 4,
+       "order_id": null,
+       "action": "close",
+       "reason": "gap_stop",
+       "direction": -1,
+       "qty": 0.2,
+       "price": 4212.3,
+       "fee": 0.0,
+       "spread_cost": 5.0,
+       "slippage_cost": 1.0,
+       "gross": -287.0000000000073
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      },
+      {
+       "order_id": 3,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225720000,
+       "position_id": 4
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E29_挂单预占保证金_出金受限_撤单释放",
+   "note": "账户 100 美元（D60）：买入限价 4195 0.1 手预占 83.9；再挂一张被拒（可用只剩 16.1）；出金 20 被拒；撤单后出金 20 成功",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 100.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ],
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 4195,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 4190,
+     "qty": 0.1
+    },
+    {
+     "before_bar": 1,
+     "op": "transfer",
+     "direction": "to_funding",
+     "amount": 20.0
+    },
+    {
+     "before_bar": 1,
+     "op": "cancel_pending",
+     "order_index": 0
+    },
+    {
+     "before_bar": 1,
+     "op": "transfer",
+     "direction": "to_funding",
+     "amount": 20.0
+    }
+   ],
+   "expected": {
+    "errors": [
+     {
+      "before_bar": 1,
+      "op": "pending",
+      "code": "margin_insufficient"
+     },
+     {
+      "before_bar": 1,
+      "op": "transfer",
+      "code": "over_withdraw"
+     }
+    ],
+    "returned": [
+     1,
+     null,
+     null
+    ],
+    "per_bar": [
+     {
+      "balance": 100.0,
+      "equity": 100.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 100.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 80.0,
+      "equity": 80.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 80.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 80.0,
+     "funding": 20.0,
+     "status": "active",
+     "last_bid": 4200,
+     "now_ms": 1767225720000,
+     "next_id": 2,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [],
+     "fills": [],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "buy_limit",
+       "result": "cancelled",
+       "ms": 1767225660000,
+       "position_id": null
+      }
+     ],
+     "transfers": [
+      {
+       "ms": 1767225660000,
+       "direction": "to_funding",
+       "amount": 20.0,
+       "equity_before": 100.0,
+       "had_positions": false
+      }
+     ],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "E28_低于最小手数与错误止损被拒",
+   "note": "0.005 手（低于 0.01）被拒；多单止损高于现价被拒；空单止盈高于现价被拒",
+   "symbol": "XAUUSD",
+   "leverage": 500,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4200,
+     4201,
+     4199,
+     4200
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.005
+    },
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.1,
+     "sl": 4201
+    },
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": -1,
+     "qty": 0.1,
+     "tp": 4210
+    }
+   ],
+   "expected": {
+    "errors": [
+     {
+      "before_bar": 1,
+      "op": "market",
+      "code": "below_min_qty"
+     },
+     {
+      "before_bar": 1,
+      "op": "market",
+      "code": "stop_wrong_side"
+     },
+     {
+      "before_bar": 1,
+      "op": "market",
+      "code": "tp_wrong_side"
+     }
+    ],
+    "returned": [],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "XAUUSD",
+     "leverage": 500,
+     "balance": 1000.0,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4200,
+     "now_ms": 1767225660000,
+     "next_id": 1,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [],
+     "fills": [],
+     "order_results": [],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "B01_市价多单止盈_吃单进挂单出",
+   "note": "100000 买 0.1 BTC：开仓吃单 0.05% + 滑点 0.01%；止盈 101000 按挂单 0.02%、不计滑点",
+   "symbol": "BTCUSDT",
+   "leverage": 30,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     100000,
+     100050,
+     99950,
+     100000
+    ],
+    [
+     100000,
+     100100,
+     99900,
+     100050
+    ],
+    [
+     100050,
+     101200,
+     100000,
+     101100
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.1,
+     "tp": 101000
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 994.9995,
+      "equity": 998.9995,
+      "used_margin": 333.3666666666667,
+      "pending_margin": 0.0,
+      "free_margin": 665.6328333333333,
+      "real_leverage": 10.01502002753755,
+      "liquidation_price": 90421.69176706826,
+      "status": "active"
+     },
+     {
+      "balance": 1091.9795,
+      "equity": 1091.9795,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1091.9795,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "BTCUSDT",
+     "leverage": 30,
+     "balance": 1091.9795,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 101100,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "entry_price": 100010.0,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 101000.0,
+       "close_reason": "tp",
+       "gross": 99.0,
+       "fees": 7.0205,
+       "spread_cost": 0.0,
+       "slippage_cost": 1.0,
+       "liquidation_adjust": 0.0,
+       "pnl": 91.9795,
+       "sl_at_close": null,
+       "tp_at_close": 101000,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.1,
+         "price": 101000,
+         "reason": "tp"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 100010.0,
+       "fee": 5.0005,
+       "spread_cost": 0.0,
+       "slippage_cost": 1.0,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "tp",
+       "direction": 1,
+       "qty": 0.1,
+       "price": 101000,
+       "fee": 2.02,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "gross": 99.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "B02_买入限价_仅触及不成交_穿过1格才成交",
+   "note": "买入限价 99000：第 1 根最低正好 99000 不成交；第 2 根最低 98999.9 成交",
+   "symbol": "BTCUSDT",
+   "leverage": 30,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     100000,
+     100050,
+     99950,
+     100000
+    ],
+    [
+     100000,
+     100010,
+     99000,
+     99500
+    ],
+    [
+     99500,
+     99600,
+     98999.9,
+     99100
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 99000,
+     "qty": 0.01
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 33.0,
+      "free_margin": 967.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 999.802,
+      "equity": 1000.802,
+      "used_margin": 33.0,
+      "pending_margin": 0.0,
+      "free_margin": 967.802,
+      "real_leverage": 0.9902058549043666,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "BTCUSDT",
+     "leverage": 30,
+     "balance": 999.802,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 99100,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [
+      {
+       "id": 2,
+       "order_id": 1,
+       "source": "buy_limit",
+       "direction": 1,
+       "qty": 0.01,
+       "initial_qty": 0.01,
+       "entry_price": 99000,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225720000,
+       "realized_gross": 0.0,
+       "fees": 0.198,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "buy_limit",
+       "direction": 1,
+       "qty": 0.01,
+       "price": 99000,
+       "fee": 0.198,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "gross": 0.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "buy_limit",
+       "result": "filled",
+       "ms": 1767225720000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "B03_卖出限价穿过与跳空",
+   "note": "卖出限价 101000：最高 101000.1 成交；另一张 102000 第 3 根开盘 102500 跳空按开盘",
+   "symbol": "BTCUSDT",
+   "leverage": 30,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     100000,
+     100050,
+     99950,
+     100000
+    ],
+    [
+     100000,
+     101000.1,
+     99990,
+     100900
+    ],
+    [
+     100900,
+     100950,
+     100800,
+     100900
+    ],
+    [
+     102500,
+     102600,
+     102400,
+     102500
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": -1,
+     "price": 101000,
+     "qty": 0.01
+    },
+    {
+     "before_bar": 2,
+     "op": "close",
+     "position_index": 0
+    },
+    {
+     "before_bar": 3,
+     "op": "pending",
+     "direction": -1,
+     "price": 102000,
+     "qty": 0.01
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1,
+     3,
+     4
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 999.798,
+      "equity": 1000.798,
+      "used_margin": 33.666666666666664,
+      "pending_margin": 0.0,
+      "free_margin": 967.1313333333334,
+      "real_leverage": 1.0081954600229017,
+      "liquidation_price": 200179.08366533864,
+      "status": "active"
+     },
+     {
+      "balance": 1000.1925495500001,
+      "equity": 1000.1925495500001,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.1925495500001,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 999.98754955,
+      "equity": 999.98754955,
+      "used_margin": 34.166666666666664,
+      "pending_margin": 0.0,
+      "free_margin": 965.8208828833334,
+      "real_leverage": 1.025012761870141,
+      "liquidation_price": 201691.9870069721,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "BTCUSDT",
+     "leverage": 30,
+     "balance": 999.98754955,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 102500,
+     "now_ms": 1767225840000,
+     "next_id": 6,
+     "positions": [
+      {
+       "id": 5,
+       "order_id": 4,
+       "source": "sell_limit",
+       "direction": -1,
+       "qty": 0.01,
+       "initial_qty": 0.01,
+       "entry_price": 102500.0,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225780000,
+       "realized_gross": 0.0,
+       "fees": 0.20500000000000002,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "sell_limit",
+       "direction": -1,
+       "qty": 0.01,
+       "entry_price": 101000,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 100910.09,
+       "close_reason": "manual",
+       "gross": 0.899100000000035,
+       "fees": 0.7065504499999999,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.1009,
+       "liquidation_adjust": 0.0,
+       "pnl": 0.19254955000003504,
+       "sl_at_close": null,
+       "tp_at_close": null,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.01,
+         "price": 100910.09,
+         "reason": "manual"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "sell_limit",
+       "direction": -1,
+       "qty": 0.01,
+       "price": 101000,
+       "fee": 0.202,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": 3,
+       "action": "close",
+       "reason": "manual",
+       "direction": -1,
+       "qty": 0.01,
+       "price": 100910.09,
+       "fee": 0.50455045,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.1009,
+       "gross": 0.899100000000035
+      },
+      {
+       "seq": 3,
+       "ms": 1767225780000,
+       "position_id": 5,
+       "order_id": 4,
+       "action": "open",
+       "reason": "sell_limit",
+       "direction": -1,
+       "qty": 0.01,
+       "price": 102500.0,
+       "fee": 0.20500000000000002,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "gross": 0.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "sell_limit",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      },
+      {
+       "order_id": 3,
+       "kind": "close",
+       "result": "filled",
+       "ms": 1767225720000,
+       "position_id": 2
+      },
+      {
+       "order_id": 4,
+       "kind": "sell_limit",
+       "result": "filled",
+       "ms": 1767225780000,
+       "position_id": 5
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "B04_止损挂单百分比滑点",
+   "note": "卖出止损 99500 触发，成交价 = 99500 × (1 − 0.01%)；之后止损 100000（空单）被打到",
+   "symbol": "BTCUSDT",
+   "leverage": 30,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     100000,
+     100050,
+     99950,
+     100000
+    ],
+    [
+     99800,
+     99850,
+     99400,
+     99600
+    ],
+    [
+     99600,
+     100100,
+     99550,
+     100050
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": -1,
+     "price": 99500,
+     "qty": 0.01,
+     "sl": 100000
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 999.50254975,
+      "equity": 998.40304975,
+      "used_margin": 33.16335,
+      "pending_margin": 0.0,
+      "free_margin": 965.23969975,
+      "real_leverage": 0.9975931065609207,
+      "liquidation_price": 198645.72208665338,
+      "status": "active"
+     },
+     {
+      "balance": 993.80299975,
+      "equity": 993.80299975,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 993.80299975,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "BTCUSDT",
+     "leverage": 30,
+     "balance": 993.80299975,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 100050,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "sell_stop",
+       "direction": -1,
+       "qty": 0.01,
+       "entry_price": 99490.05,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 100010.0,
+       "close_reason": "stop",
+       "gross": -5.199499999999971,
+       "fees": 0.9975002500000001,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.1995,
+       "liquidation_adjust": 0.0,
+       "pnl": -6.197000249999971,
+       "sl_at_close": 100000,
+       "tp_at_close": null,
+       "initial_sl": 100000,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.01,
+         "price": 100010.0,
+         "reason": "stop"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "sell_stop",
+       "direction": -1,
+       "qty": 0.01,
+       "price": 99490.05,
+       "fee": 0.49745025000000004,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.09950000000000002,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "stop",
+       "direction": -1,
+       "qty": 0.01,
+       "price": 100010.0,
+       "fee": 0.50005,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.1,
+       "gross": -5.199499999999971
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "sell_stop",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "B05_维持保证金强平",
+   "note": "1000 USDT 在 100000 买 0.25 BTC（30 倍，保证金 833），维持保证金率 0.4%；第 2 根跌到 95000 强平",
+   "symbol": "BTCUSDT",
+   "leverage": 30,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     100000,
+     100050,
+     99950,
+     100000
+    ],
+    [
+     100000,
+     100010,
+     99990,
+     100000
+    ],
+    [
+     100000,
+     100010,
+     95000,
+     96000
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.25
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 987.49875,
+      "equity": 984.99875,
+      "used_margin": 833.4166666666666,
+      "pending_margin": 0.0,
+      "free_margin": 151.58208333333334,
+      "real_leverage": 25.380742868963033,
+      "liquidation_price": 96445.78815261045,
+      "status": "active"
+     },
+     {
+      "balance": 0.0,
+      "equity": 0.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 0.0,
+      "real_leverage": null,
+      "liquidation_price": null,
+      "status": "ended_liquidation"
+     }
+    ],
+    "final": {
+     "symbol": "BTCUSDT",
+     "leverage": 30,
+     "balance": 0.0,
+     "funding": 0.0,
+     "status": "ended_liquidation",
+     "last_bid": 96000,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.25,
+       "entry_price": 100010.0,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 96436.14357379518,
+       "close_reason": "liquidation",
+       "gross": -893.4641065512042,
+       "fees": 24.5557679467244,
+       "spread_cost": 0.0,
+       "slippage_cost": 4.911144703815261,
+       "liquidation_adjust": -81.98012550207136,
+       "pnl": -999.9999999999999,
+       "sl_at_close": null,
+       "tp_at_close": null,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.25,
+         "price": 96436.14357379518,
+         "reason": "liquidation"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.25,
+       "price": 100010.0,
+       "fee": 12.50125,
+       "spread_cost": 0.0,
+       "slippage_cost": 2.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "liquidation",
+       "direction": 1,
+       "qty": 0.25,
+       "price": 96436.14357379518,
+       "fee": 12.054517946724399,
+       "spread_cost": 0.0,
+       "slippage_cost": 2.4111447038152614,
+       "gross": -893.4641065512042
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": [
+      {
+       "ms": 1767225720000,
+       "liquidation_price": 96445.78815261045,
+       "fill_level": 96445.78815261045,
+       "at_open": false,
+       "balance_before": 987.49875,
+       "residual_cleared": 81.98012550207136,
+       "status_after": "ended_liquidation"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "name": "B06_最小名义价值",
+   "note": "价格 40000 时 0.001 BTC = 40 USDT，低于最小名义价值 50 被拒；0.002 可以",
+   "symbol": "BTCUSDT",
+   "leverage": 30,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     40000,
+     40010,
+     39990,
+     40000
+    ],
+    [
+     40000,
+     40010,
+     39990,
+     40000
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.001
+    },
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.002
+    }
+   ],
+   "expected": {
+    "errors": [
+     {
+      "before_bar": 1,
+      "op": "market",
+      "code": "below_min_notional"
+     }
+    ],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 999.959996,
+      "equity": 999.951996,
+      "used_margin": 2.666933333333333,
+      "pending_margin": 0.0,
+      "free_margin": 997.2850626666667,
+      "real_leverage": 0.08000384050435957,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "BTCUSDT",
+     "leverage": 30,
+     "balance": 999.959996,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 40000,
+     "now_ms": 1767225720000,
+     "next_id": 3,
+     "positions": [
+      {
+       "id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.002,
+       "initial_qty": 0.002,
+       "entry_price": 40004.0,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225660000,
+       "realized_gross": 0.0,
+       "fees": 0.040004,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.008,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.002,
+       "price": 40004.0,
+       "fee": 0.040004,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.008,
+       "gross": 0.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "B08_币安挂单预占保证金",
+   "note": "100 USDT、30 倍（D60）：买入限价 99000 0.03 BTC 预占 99；再挂 0.001 BTC 被拒；改单时先放回自己的预占：改到 99500（需 99.5）可以，改成 0.031 BTC（需 102.3）被拒，最后改到 98000",
+   "symbol": "BTCUSDT",
+   "leverage": 30,
+   "balance": 100.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     100000,
+     100050,
+     99950,
+     100000
+    ],
+    [
+     100000,
+     100010,
+     99990,
+     100000
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 99000,
+     "qty": 0.03
+    },
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 98000,
+     "qty": 0.001
+    },
+    {
+     "before_bar": 1,
+     "op": "modify_pending",
+     "order_index": 0,
+     "price": 99500,
+     "qty": 0.03
+    },
+    {
+     "before_bar": 1,
+     "op": "modify_pending",
+     "order_index": 0,
+     "price": 99000,
+     "qty": 0.031
+    },
+    {
+     "before_bar": 1,
+     "op": "modify_pending",
+     "order_index": 0,
+     "price": 98000,
+     "qty": 0.03
+    }
+   ],
+   "expected": {
+    "errors": [
+     {
+      "before_bar": 1,
+      "op": "pending",
+      "code": "margin_insufficient"
+     },
+     {
+      "before_bar": 1,
+      "op": "modify_pending",
+      "code": "margin_insufficient"
+     }
+    ],
+    "returned": [
+     1,
+     null,
+     null
+    ],
+    "per_bar": [
+     {
+      "balance": 100.0,
+      "equity": 100.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 100.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 100.0,
+      "equity": 100.0,
+      "used_margin": 0.0,
+      "pending_margin": 98.0,
+      "free_margin": 2.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "BTCUSDT",
+     "leverage": 30,
+     "balance": 100.0,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 100000,
+     "now_ms": 1767225720000,
+     "next_id": 2,
+     "positions": [],
+     "pending": [
+      {
+       "id": 1,
+       "direction": 1,
+       "kind": "limit",
+       "price": 98000,
+       "qty": 0.03,
+       "sl": null,
+       "tp": null,
+       "placed_ms": 1767225660000,
+       "history": [
+        {
+         "ms": 1767225660000,
+         "kind": "limit",
+         "price": 99000,
+         "qty": 0.03,
+         "sl": null,
+         "tp": null
+        },
+        {
+         "ms": 1767225660000,
+         "kind": "limit",
+         "price": 99500,
+         "qty": 0.03,
+         "sl": null,
+         "tp": null
+        }
+       ]
+      }
+     ],
+     "queue": [],
+     "trades": [],
+     "fills": [],
+     "order_results": [],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "B07_空单市价止损",
+   "note": "100000 卖 0.05 BTC 止损 101000；第 2 根最高 101500 打到止损，成交 101000 × (1 + 0.01%)",
+   "symbol": "BTCUSDT",
+   "leverage": 30,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     100000,
+     100050,
+     99950,
+     100000
+    ],
+    [
+     100000,
+     100100,
+     99900,
+     100000
+    ],
+    [
+     100000,
+     101500,
+     99950,
+     101200
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": -1,
+     "qty": 0.05,
+     "sl": 101000
+    }
+   ],
+   "expected": {
+    "errors": [],
+    "returned": [
+     1
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 997.50025,
+      "equity": 997.00025,
+      "used_margin": 166.65,
+      "pending_margin": 0.0,
+      "free_margin": 830.3502500000001,
+      "real_leverage": 5.015043877872648,
+      "liquidation_price": 119462.156374502,
+      "status": "active"
+     },
+     {
+      "balance": 943.9699974999997,
+      "equity": 943.9699974999997,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 943.9699974999997,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "BTCUSDT",
+     "leverage": 30,
+     "balance": 943.9699974999997,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 101200,
+     "now_ms": 1767225780000,
+     "next_id": 3,
+     "positions": [],
+     "pending": [],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": -1,
+       "qty": 0.05,
+       "entry_price": 99990.0,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 101010.10000000002,
+       "close_reason": "stop",
+       "gross": -51.005000000000294,
+       "fees": 5.025002500000001,
+       "spread_cost": 0.0,
+       "slippage_cost": 1.005,
+       "liquidation_adjust": 0.0,
+       "pnl": -56.03000250000029,
+       "sl_at_close": 101000,
+       "tp_at_close": null,
+       "initial_sl": 101000,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.05,
+         "price": 101010.1,
+         "reason": "stop"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": -1,
+       "qty": 0.05,
+       "price": 99990.0,
+       "fee": 2.49975,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": null,
+       "action": "close",
+       "reason": "stop",
+       "direction": -1,
+       "qty": 0.05,
+       "price": 101010.1,
+       "fee": 2.5252525000000006,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.505,
+       "gross": -51.005000000000294
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "B09_改杠杆只在空仓无挂单时",
+   "note": "30 倍开局，第 1 根前改成 10 倍再买 0.05 BTC（保证金 500）；同一时刻再改杠杆被拒（市价单还在排队）；第 2 根前持仓中改杠杆被拒；平仓后改 50 倍、改 200 倍被拒（最高 150）；再买 0.05（保证金 100）；第 3 根前平仓后挂一张限价单，有挂单时改杠杆被拒（D72）",
+   "symbol": "BTCUSDT",
+   "leverage": 30,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     100000,
+     100050,
+     99950,
+     100000
+    ],
+    [
+     100000,
+     100010,
+     99990,
+     100000
+    ],
+    [
+     100000,
+     100010,
+     99990,
+     100000
+    ],
+    [
+     100000,
+     100010,
+     99990,
+     100000
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "set_leverage",
+     "leverage": 10
+    },
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.05
+    },
+    {
+     "before_bar": 1,
+     "op": "set_leverage",
+     "leverage": 20
+    },
+    {
+     "before_bar": 2,
+     "op": "set_leverage",
+     "leverage": 50
+    },
+    {
+     "before_bar": 2,
+     "op": "close",
+     "position_index": 0
+    },
+    {
+     "before_bar": 2,
+     "op": "set_leverage",
+     "leverage": 50
+    },
+    {
+     "before_bar": 2,
+     "op": "set_leverage",
+     "leverage": 200
+    },
+    {
+     "before_bar": 2,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.05
+    },
+    {
+     "before_bar": 3,
+     "op": "close",
+     "position_index": 0
+    },
+    {
+     "before_bar": 3,
+     "op": "pending",
+     "direction": 1,
+     "price": 99000,
+     "qty": 0.01
+    },
+    {
+     "before_bar": 3,
+     "op": "set_leverage",
+     "leverage": 20
+    }
+   ],
+   "expected": {
+    "errors": [
+     {
+      "before_bar": 1,
+      "op": "set_leverage",
+      "code": "leverage_busy"
+     },
+     {
+      "before_bar": 2,
+      "op": "set_leverage",
+      "code": "leverage_busy"
+     },
+     {
+      "before_bar": 2,
+      "op": "set_leverage",
+      "code": "bad_leverage"
+     },
+     {
+      "before_bar": 3,
+      "op": "set_leverage",
+      "code": "leverage_busy"
+     }
+    ],
+    "returned": [
+     null,
+     1,
+     3,
+     null,
+     4,
+     6,
+     7
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 997.49975,
+      "equity": 996.99975,
+      "used_margin": 500.05,
+      "pending_margin": 0.0,
+      "free_margin": 496.94974999999994,
+      "real_leverage": 5.01504639294042,
+      "liquidation_price": 80381.53112449798,
+      "status": "active"
+     },
+     {
+      "balance": 991.49975,
+      "equity": 990.99975,
+      "used_margin": 100.01,
+      "pending_margin": 0.0,
+      "free_margin": 890.98975,
+      "real_leverage": 5.045409950910684,
+      "liquidation_price": 80502.01305220883,
+      "status": "active"
+     },
+     {
+      "balance": 988.0,
+      "equity": 988.0,
+      "used_margin": 0.0,
+      "pending_margin": 19.8,
+      "free_margin": 968.2,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "BTCUSDT",
+     "leverage": 50,
+     "balance": 988.0,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 100000,
+     "now_ms": 1767225840000,
+     "next_id": 8,
+     "positions": [],
+     "pending": [
+      {
+       "id": 7,
+       "direction": 1,
+       "kind": "limit",
+       "price": 99000,
+       "qty": 0.01,
+       "sl": null,
+       "tp": null,
+       "placed_ms": 1767225780000,
+       "history": []
+      }
+     ],
+     "queue": [],
+     "trades": [
+      {
+       "position_id": 2,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.05,
+       "entry_price": 100010.0,
+       "open_ms": 1767225660000,
+       "close_ms": 1767225720000,
+       "exit_price_avg": 99990.0,
+       "close_reason": "manual",
+       "gross": -1.0,
+       "fees": 5.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 1.0,
+       "liquidation_adjust": 0.0,
+       "pnl": -6.0,
+       "sl_at_close": null,
+       "tp_at_close": null,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225720000,
+         "qty": 0.05,
+         "price": 99990.0,
+         "reason": "manual"
+        }
+       ]
+      },
+      {
+       "position_id": 5,
+       "order_id": 4,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.05,
+       "entry_price": 100010.0,
+       "open_ms": 1767225720000,
+       "close_ms": 1767225780000,
+       "exit_price_avg": 99990.0,
+       "close_reason": "manual",
+       "gross": -1.0,
+       "fees": 5.0,
+       "spread_cost": 0.0,
+       "slippage_cost": 1.0,
+       "liquidation_adjust": 0.0,
+       "pnl": -6.0,
+       "sl_at_close": null,
+       "tp_at_close": null,
+       "initial_sl": null,
+       "exits": [
+        {
+         "ms": 1767225780000,
+         "qty": 0.05,
+         "price": 99990.0,
+         "reason": "manual"
+        }
+       ]
+      }
+     ],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 2,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.05,
+       "price": 100010.0,
+       "fee": 2.50025,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 2,
+       "order_id": 3,
+       "action": "close",
+       "reason": "manual",
+       "direction": 1,
+       "qty": 0.05,
+       "price": 99990.0,
+       "fee": 2.49975,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": -1.0
+      },
+      {
+       "seq": 3,
+       "ms": 1767225720000,
+       "position_id": 5,
+       "order_id": 4,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.05,
+       "price": 100010.0,
+       "fee": 2.50025,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": 0.0
+      },
+      {
+       "seq": 4,
+       "ms": 1767225780000,
+       "position_id": 5,
+       "order_id": 6,
+       "action": "close",
+       "reason": "manual",
+       "direction": 1,
+       "qty": 0.05,
+       "price": 99990.0,
+       "fee": 2.49975,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.5,
+       "gross": -1.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 2
+      },
+      {
+       "order_id": 3,
+       "kind": "close",
+       "result": "filled",
+       "ms": 1767225720000,
+       "position_id": 2
+      },
+      {
+       "order_id": 4,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225720000,
+       "position_id": 5
+      },
+      {
+       "order_id": 6,
+       "kind": "close",
+       "result": "filled",
+       "ms": 1767225780000,
+       "position_id": 5
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  },
+  {
+   "name": "B10_ETH_价格两位小数_最小名义价值20",
+   "note": "ETHUSDT：价格 4000 时 0.004 ETH = 16 USDT 低于 20 被拒，0.005 ETH = 20 可以；买入限价 3999.99 要穿过 1 格（0.01）才成交：第 1 根最低正好 3999.99 不成交、第 2 根最低 3999.98 成交",
+   "symbol": "ETHUSDT",
+   "leverage": 30,
+   "balance": 1000.0,
+   "funding": 0.0,
+   "bars": [
+    [
+     4000,
+     4000.5,
+     3999.5,
+     4000
+    ],
+    [
+     4000,
+     4001,
+     3999.99,
+     4000
+    ],
+    [
+     4000,
+     4001,
+     3999.98,
+     4000
+    ]
+   ],
+   "actions": [
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.004
+    },
+    {
+     "before_bar": 1,
+     "op": "market",
+     "direction": 1,
+     "qty": 0.005
+    },
+    {
+     "before_bar": 1,
+     "op": "pending",
+     "direction": 1,
+     "price": 3999.99,
+     "qty": 0.006
+    }
+   ],
+   "expected": {
+    "errors": [
+     {
+      "before_bar": 1,
+      "op": "market",
+      "code": "below_min_notional"
+     }
+    ],
+    "returned": [
+     1,
+     2
+    ],
+    "per_bar": [
+     {
+      "balance": 1000.0,
+      "equity": 1000.0,
+      "used_margin": 0.0,
+      "pending_margin": 0.0,
+      "free_margin": 1000.0,
+      "real_leverage": 0.0,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 999.989999,
+      "equity": 999.9879990000001,
+      "used_margin": 0.6667333333333334,
+      "pending_margin": 0.799998,
+      "free_margin": 998.5212676666667,
+      "real_leverage": 0.020000240022880512,
+      "liquidation_price": null,
+      "status": "active"
+     },
+     {
+      "balance": 999.9851990120001,
+      "equity": 999.9832590120001,
+      "used_margin": 1.4667313333333334,
+      "pending_margin": 0.0,
+      "free_margin": 998.5165276786668,
+      "real_leverage": 0.04400073661580367,
+      "liquidation_price": null,
+      "status": "active"
+     }
+    ],
+    "final": {
+     "symbol": "ETHUSDT",
+     "leverage": 30,
+     "balance": 999.9851990120001,
+     "funding": 0.0,
+     "status": "active",
+     "last_bid": 4000,
+     "now_ms": 1767225780000,
+     "next_id": 5,
+     "positions": [
+      {
+       "id": 3,
+       "order_id": 1,
+       "source": "market",
+       "direction": 1,
+       "qty": 0.005,
+       "initial_qty": 0.005,
+       "entry_price": 4000.4,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225660000,
+       "realized_gross": 0.0,
+       "fees": 0.010001000000000001,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.002,
+       "exits": []
+      },
+      {
+       "id": 4,
+       "order_id": 2,
+       "source": "buy_limit",
+       "direction": 1,
+       "qty": 0.006,
+       "initial_qty": 0.006,
+       "entry_price": 3999.99,
+       "sl": null,
+       "tp": null,
+       "initial_sl": null,
+       "open_ms": 1767225720000,
+       "realized_gross": 0.0,
+       "fees": 0.004799988,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "exits": []
+      }
+     ],
+     "pending": [],
+     "queue": [],
+     "trades": [],
+     "fills": [
+      {
+       "seq": 1,
+       "ms": 1767225660000,
+       "position_id": 3,
+       "order_id": 1,
+       "action": "open",
+       "reason": "market",
+       "direction": 1,
+       "qty": 0.005,
+       "price": 4000.4,
+       "fee": 0.010001000000000001,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.002,
+       "gross": 0.0
+      },
+      {
+       "seq": 2,
+       "ms": 1767225720000,
+       "position_id": 4,
+       "order_id": 2,
+       "action": "open",
+       "reason": "buy_limit",
+       "direction": 1,
+       "qty": 0.006,
+       "price": 3999.99,
+       "fee": 0.004799988,
+       "spread_cost": 0.0,
+       "slippage_cost": 0.0,
+       "gross": 0.0
+      }
+     ],
+     "order_results": [
+      {
+       "order_id": 1,
+       "kind": "market",
+       "result": "filled",
+       "ms": 1767225660000,
+       "position_id": 3
+      },
+      {
+       "order_id": 2,
+       "kind": "buy_limit",
+       "result": "filled",
+       "ms": 1767225720000,
+       "position_id": 4
+      }
+     ],
+     "transfers": [],
+     "liquidations": []
+    }
+   }
+  }
+ ]
+}

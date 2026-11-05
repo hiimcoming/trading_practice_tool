@@ -1,0 +1,23 @@
+{
+  "name": "trading-practice-tool-web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "lightweight-charts": "5.2.1",
+    "preact": "11.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "fancy-canvas": "2.1.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.4",
+    "vitest": "5.0.5"
+  }
+}

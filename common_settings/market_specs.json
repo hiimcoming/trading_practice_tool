@@ -1,0 +1,153 @@
+{
+  "_说明": [
+    "品种规格（前后端共用的唯一真本，规格书 2.3、3.1、15.2 节）。Python 和 TypeScript 都读这个文件，不各写一份。",
+    "交易成本、合约单位、手数步长、滑点沿用 CryptoTrade config/markets.py（2026-10-04 用户确认的数值），Exness 点差按 D46 固定 0.25。",
+    "history_start：历史数据从哪个月开始（含）；只下载完整的月份。",
+    "day_anchor：日线起点，utc_0 = UTC 0 点，ny_17 = 纽约 17:00（自动处理夏令时）。trading_hours 为 null 表示不过滤。",
+    "列在 _待核实 里的字段是起草时未查证的假设，用到它们的阶段开工前先查证。",
+    "max_normal_gap_minutes：两根 1m 之间超过这么久就算「数据缺口」，随机起点后 300 根内不能有（周末休市、节假日在此之内算正常；黄金圣诞、复活节长周末约 4381 分钟，所以设为 5 天）。",
+    "limit_fill_rule：限价挂单的成交条件（规格书 6.7 节）。touch = 价格触及即成交（Exness 默认）；cross_one_tick = 穿过挂单价至少 1 个 tick_size 才成交（币安默认）。",
+    "stop_out_level：Exness 强平线（保证金水平），0 = 净值 ≤ 0 才强平（D55）。币安用 maintenance_margin_rate 与 maintenance_amount：维持保证金 = 名义价值 × 费率 − 速算额（第一档速算额为 0）。",
+    "qty_unit：下单数量的单位（Exness 为手，币安为币名）。",
+    "chart_history_start（D74）：更早的 1m 只用来画图表左边的背景 K 线（往左拖时加载），随机抽练习片段仍只从 history_start 起抽。币安永续合约上线：BTCUSDT 2019-09-08、ETHUSDT 2019-11-27，只取上线后的第一个完整月份。",
+    "week_start（D74）：周线从星期几 UTC 0 点开始。币安 monday（与币安一致）；黄金 sunday（周日晚上开盘那几小时算新的一周，与 MT4、TradingView 一致）。"
+  ],
+  "markets": {
+    "XAUUSD": {
+      "display_name": "XAUUSD 黄金",
+      "platform": "exness",
+      "data_source": "dukascopy",
+      "data_symbol": "XAUUSD",
+      "price_divisor": 1000,
+      "skip_saturday": true,
+      "history_start": "2021-10",
+      "day_anchor": "utc_0",
+      "trading_hours": null,
+      "tick_size": 0.001,
+      "price_precision": 3,
+      "contract_size": 100.0,
+      "leverage": {
+        "default": 500,
+        "min": 100,
+        "max": 1000,
+        "presets": [
+          100,
+          200,
+          500,
+          1000
+        ]
+      },
+      "qty_step": 0.01,
+      "min_qty": 0.01,
+      "min_notional": 0.0,
+      "cost": {
+        "model": "spread",
+        "spread": 0.25,
+        "commission_per_lot_side": 0.0
+      },
+      "slippage": {
+        "kind": "abs",
+        "value": 0.05
+      },
+      "stop_out_level": 0.0,
+      "max_normal_gap_minutes": 7200,
+      "limit_fill_rule": "touch",
+      "qty_unit": "手",
+      "chart_history_start": "2015-01",
+      "week_start": "sunday"
+    },
+    "BTCUSDT": {
+      "display_name": "BTCUSDT 永续",
+      "platform": "binance",
+      "data_source": "binance_um",
+      "data_symbol": "BTCUSDT",
+      "skip_saturday": false,
+      "history_start": "2020-10",
+      "day_anchor": "utc_0",
+      "trading_hours": null,
+      "tick_size": 0.1,
+      "price_precision": 1,
+      "contract_size": 1.0,
+      "leverage": {
+        "default": 30,
+        "min": 1,
+        "max": 125,
+        "presets": [
+          10,
+          20,
+          30,
+          50
+        ]
+      },
+      "qty_step": 0.001,
+      "min_qty": 0.001,
+      "min_notional": 50.0,
+      "cost": {
+        "model": "pct",
+        "maker": 0.0002,
+        "taker": 0.0005
+      },
+      "slippage": {
+        "kind": "pct",
+        "value": 0.0001
+      },
+      "maintenance_margin_rate": 0.004,
+      "_待核实": [
+        "leverage.max 与 presets（按仓位档位）",
+        "maintenance_margin_rate 0.4% 与 maintenance_amount 0：名义价值 16000 USDT 以内已与币安官方计算器核对一致（2026-10-21）；更大仓位的分档未核对"
+      ],
+      "max_normal_gap_minutes": 120,
+      "limit_fill_rule": "cross_one_tick",
+      "maintenance_amount": 0.0,
+      "qty_unit": "BTC",
+      "chart_history_start": "2019-10",
+      "week_start": "monday"
+    },
+    "ETHUSDT": {
+      "display_name": "ETHUSDT 永续",
+      "platform": "binance",
+      "data_source": "binance_um",
+      "data_symbol": "ETHUSDT",
+      "skip_saturday": false,
+      "history_start": "2020-10",
+      "day_anchor": "utc_0",
+      "trading_hours": null,
+      "tick_size": 0.01,
+      "price_precision": 2,
+      "contract_size": 1.0,
+      "leverage": {
+        "default": 30,
+        "min": 1,
+        "max": 150,
+        "presets": [
+          10,
+          20,
+          30,
+          50
+        ]
+      },
+      "qty_step": 0.001,
+      "min_qty": 0.001,
+      "min_notional": 20.0,
+      "cost": {
+        "model": "pct",
+        "maker": 0.0002,
+        "taker": 0.0005
+      },
+      "slippage": {
+        "kind": "pct",
+        "value": 0.0001
+      },
+      "maintenance_margin_rate": 0.004,
+      "max_normal_gap_minutes": 120,
+      "limit_fill_rule": "cross_one_tick",
+      "maintenance_amount": 0.0,
+      "qty_unit": "ETH",
+      "_核实记录": [
+        "2026-10-25 从币安官方接口核对：exchangeInfo（最小价格单位 0.01、数量步长和最小数量 0.001、最小名义价值 20 USDT）；杠杆分档第一档名义价值 0–300000 USDT、维持保证金率 0.4%、速算额 0、最高 150 倍（与 BTCUSDT 第一档相同）"
+      ],
+      "chart_history_start": "2019-12",
+      "week_start": "monday"
+    }
+  }
+}
